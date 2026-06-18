@@ -1,0 +1,18 @@
+{
+  "name": "underworld-radio-puzzle",
+  "version": "1.0.0",
+  "description": "阴间电台谜题服务 - 面向叙事恐怖游戏开发者的后端式谜题生成器",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "node --watch src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "express": "^5.2.1",
+    "uuid": "^14.0.0"
+  }
+}
