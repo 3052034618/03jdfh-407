@@ -3,7 +3,7 @@ const router = express.Router();
 const { generatePuzzle, applyPlatformLimits } = require('../puzzle/generator');
 const { createPuzzleRequest, createDifficultyConstraint } = require('../../models/schemas');
 const { REPLAY_ADAPTATIONS, getAdaptationLevel } = require('../../templates/adaptations');
-const { getSession, updatePlayerState } = require('../../store/sessionStore');
+const { getSession, updatePlayerState, recordReplay, recordFailureReport } = require('../../store/sessionStore');
 
 router.get('/levels', (req, res) => {
   res.json({
@@ -109,6 +109,7 @@ router.post('/replay', (req, res) => {
 
   if (sessionId && getSession(sessionId)) {
     updatePlayerState(sessionId, { failureCount: playerState.failureCount });
+    recordReplay(sessionId, puzzle.puzzleId, adaptation.level, playerState.failureCount, puzzle);
   }
 
   res.json({
@@ -134,16 +135,20 @@ router.post('/report-failure', (req, res) => {
   const { sessionId, failureType } = req.body;
 
   let failureCount = 0;
+  let beforeFailure = 0;
   let session = null;
 
   if (sessionId) {
     session = getSession(sessionId);
     if (session) {
-      failureCount = session.playerState.failureCount + 1;
+      beforeFailure = session.playerState.failureCount;
+      failureCount = beforeFailure + 1;
       updatePlayerState(sessionId, { failureCount });
+      recordFailureReport(sessionId, beforeFailure, failureCount, failureType || 'manual');
     }
   } else {
-    failureCount = (req.body.currentFailureCount || 0) + 1;
+    beforeFailure = (req.body.currentFailureCount || 0);
+    failureCount = beforeFailure + 1;
   }
 
   const adaptation = getAdaptationLevel(failureCount);

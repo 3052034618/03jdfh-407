@@ -1,0 +1,243 @@
+[
+  {
+    "draftId": "0af405a3-d04d-4c9a-8abf-536f1a6729f4",
+    "chapterId": "ch02",
+    "currentMap": "医院西楼三层",
+    "answerType": "frequency",
+    "answerValue": "12",
+    "answerDisplay": "12",
+    "answerLength": 2,
+    "difficultyTier": "easy",
+    "difficulty": {},
+    "platform": "pc",
+    "broadcast": {
+      "text": "测试广播0.5436811021989223"
+    },
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "frequency",
+      "value": "12",
+      "display": "12"
+    },
+    "adaptation": {},
+    "platformAdjustments": [],
+    "spoilerFilter": {
+      "applied": false,
+      "filteredItems": []
+    },
+    "status": "draft",
+    "tags": [
+      "chapter2",
+      "critical"
+    ],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T19:52:25.734Z",
+    "updatedAt": "2026-06-18T19:52:25.778Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": 4
+  },
+  {
+    "draftId": "7913df46-cf2b-491e-9d13-4b726a8519b2",
+    "chapterId": "ch02",
+    "currentMap": "太平间",
+    "answerType": "code",
+    "answerValue": "12",
+    "answerDisplay": "12",
+    "answerLength": 2,
+    "difficultyTier": "hard",
+    "difficulty": {},
+    "platform": "mobile",
+    "broadcast": {
+      "text": "测试广播0.9366003502264236"
+    },
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "code",
+      "value": "12",
+      "display": "12"
+    },
+    "adaptation": {},
+    "platformAdjustments": [
+      {},
+      {},
+      {},
+      {},
+      {}
+    ],
+    "spoilerFilter": {
+      "applied": true,
+      "totalReplacements": 3,
+      "fullReport": {}
+    },
+    "status": "draft",
+    "tags": [
+      "chapter2",
+      "critical"
+    ],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T19:52:25.738Z",
+    "updatedAt": "2026-06-18T19:52:25.765Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": null
+  },
+  {
+    "draftId": "a036b2f5-36cd-48d6-a308-1d7aba500354",
+    "chapterId": "ch02",
+    "currentMap": "地下车库",
+    "answerType": "name",
+    "answerValue": "12",
+    "answerDisplay": "12",
+    "answerLength": 2,
+    "difficultyTier": "nightmare",
+    "difficulty": {},
+    "platform": "console",
+    "broadcast": {
+      "text": "测试广播0.3362021960694489"
+    },
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "name",
+      "value": "12",
+      "display": "12"
+    },
+    "adaptation": {},
+    "platformAdjustments": [],
+    "spoilerFilter": {
+      "applied": false,
+      "filteredItems": []
+    },
+    "status": "draft",
+    "tags": [
+      "chapter2",
+      "critical"
+    ],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T19:52:25.740Z",
+    "updatedAt": "2026-06-18T19:52:25.765Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": null
+  },
+  {
+    "draftId": "4ba1ac0c-47c3-427f-88f3-75ab812b6281",
+    "chapterId": "ch02",
+    "currentMap": "医院西楼",
+    "answerType": "date",
+    "answerValue": "12",
+    "answerDisplay": "12",
+    "answerLength": 2,
+    "difficultyTier": "standard",
+    "difficulty": {},
+    "platform": "pc",
+    "broadcast": {
+      "text": "测试广播0.5921068719323367"
+    },
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "date",
+      "value": "12",
+      "display": "12"
+    },
+    "adaptation": {},
+    "platformAdjustments": [],
+    "spoilerFilter": {
+      "applied": false,
+      "filteredItems": []
+    },
+    "status": "draft",
+    "tags": [],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T19:52:25.743Z",
+    "updatedAt": "2026-06-18T19:52:25.743Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": null
+  },
+  {
+    "draftId": "5b27f1e6-b302-490c-a3bd-93694a034189",
+    "chapterId": "ch02",
+    "currentMap": "门诊大厅",
+    "answerType": "direction",
+    "answerValue": "12",
+    "answerDisplay": "12",
+    "answerLength": 2,
+    "difficultyTier": "hard",
+    "difficulty": {},
+    "platform": "pc",
+    "broadcast": {
+      "text": "测试广播0.7756629633094734"
+    },
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "direction",
+      "value": "12",
+      "display": "12"
+    },
+    "adaptation": {},
+    "platformAdjustments": [],
+    "spoilerFilter": {
+      "applied": false,
+      "filteredItems": []
+    },
+    "status": "draft",
+    "tags": [],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T19:52:25.745Z",
+    "updatedAt": "2026-06-18T19:52:25.745Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": null
+  },
+  {
+    "draftId": "7ce5e9bc-3e34-4ac9-b8a7-d94e5833e3e3",
+    "chapterId": "ch",
+    "currentMap": "t1",
+    "answerType": "code",
+    "answerValue": "1",
+    "answerDisplay": null,
+    "answerLength": 1,
+    "difficultyTier": "hard",
+    "difficulty": {},
+    "platform": "pc",
+    "broadcast": {},
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "code",
+      "value": "1"
+    },
+    "adaptation": {},
+    "platformAdjustments": [],
+    "spoilerFilter": {
+      "applied": false,
+      "filteredItems": []
+    },
+    "status": "draft",
+    "tags": [],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T19:53:01.270Z",
+    "updatedAt": "2026-06-18T19:53:01.270Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": null
+  }
+]

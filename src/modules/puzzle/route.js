@@ -48,15 +48,33 @@ router.post('/request', (req, res) => {
   const puzzle = generatePuzzle(requestForGenerator, adjustedDifficulty, playerState);
 
   if (sessionId && session) {
-    addPuzzleToSession(sessionId, puzzle.puzzleId, puzzle);
+    addPuzzleToSession(sessionId, puzzle.puzzleId, puzzle, puzzle);
     updatePlayerState(sessionId, { failureCount: playerState.failureCount });
   }
 
   const platformWarnings = adjustments.map(a => a.reason);
 
+  const draftablePayload = {
+    puzzleId: puzzle.puzzleId,
+    chapterId: puzzle.chapterId,
+    currentMap: puzzle.currentMap,
+    platform: puzzle.platform,
+    broadcast: puzzle.broadcast,
+    clues: puzzle.clues,
+    wrongFeedback: puzzle.wrongFeedback,
+    successHook: puzzle.successHook,
+    difficulty: puzzle.difficulty,
+    adaptation: puzzle.adaptation,
+    answer: puzzle.answer,
+    platformAdjustments: adjustments,
+    spoilerFilter: puzzle.spoilerFilter,
+    requestedAt: puzzle.createdAt,
+  };
+
   const response = {
     puzzleId: puzzle.puzzleId,
     chapterId: puzzle.chapterId,
+    currentMap: puzzle.currentMap,
     createdAt: puzzle.createdAt,
     broadcast: puzzle.broadcast,
     clues: puzzle.clues,
@@ -71,6 +89,8 @@ router.post('/request', (req, res) => {
     spoilerFilter: puzzle.spoilerFilter,
     forbiddenInfoFiltered: puzzle.forbiddenInfoFiltered,
     sessionId: sessionId || undefined,
+    failureCount: playerState.failureCount,
+    draftSnapshot: draftablePayload,
   };
 
   res.json(response);

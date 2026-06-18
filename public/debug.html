@@ -25,6 +25,10 @@ select{cursor:pointer}
 .btn.secondary{border-color:#4a4a5e;color:#4a4a5e}
 .btn.secondary:hover{background:#4a4a5e;color:#0a0a0f}
 .btn.small{padding:4px 10px;font-size:10px;margin-top:4px}
+.btn.warn{border-color:#c08030;color:#c08030}
+.btn.warn:hover{background:#c08030;color:#0a0a0f}
+.btn.danger{border-color:#c03040;color:#c03040}
+.btn.danger:hover{background:#c03040;color:#0a0a0f}
 .radio-group{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
 .radio-group label{display:inline-flex;align-items:center;gap:4px;margin:0;cursor:pointer;font-size:11px;padding:3px 7px;border:1px solid #2a2a3e;border-radius:2px;color:#8a8a9e}
 .radio-group input[type="radio"]{width:auto;margin:0;accent-color:#e8475f}
@@ -56,6 +60,7 @@ select{cursor:pointer}
 .spoiler-original{color:#e070a0;text-decoration:line-through;opacity:.7}
 .spoiler-replacement{color:#70c0a0;margin-left:6px}
 .spoiler-count{float:right;font-size:10px;color:#6a6a7e}
+.missed-item{padding:5px 10px;margin:4px 0;background:#101a10;border-left:2px solid #508040;font-size:11px;color:#80a070;opacity:.8}
 .tabs{display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid #2a2a3e;flex-wrap:wrap}
 .tab{padding:6px 14px;font-size:11px;cursor:pointer;border-bottom:2px solid transparent;color:#6a6a7e;font-family:'Courier New',monospace;background:transparent;border-top:none;border-left:none;border-right:none;letter-spacing:1px}
 .tab.active{color:#e8475f;border-bottom-color:#e8475f}
@@ -64,14 +69,21 @@ select{cursor:pointer}
 .checkbox-row{display:flex;align-items:center;gap:6px;margin-top:7px}
 .checkbox-row input[type="checkbox"]{width:auto;accent-color:#e8475f}
 .checkbox-row label{margin:0;font-size:11px;cursor:pointer;color:#8a8a9e}
-.draft-item{padding:9px 12px;margin:6px 0;background:#12121e;border:1px solid #2a2a3e;border-left:3px solid #4a4a5e;cursor:pointer;border-radius:2px;transition:all .15s}
+.draft-item{padding:9px 12px;margin:6px 0;background:#12121e;border:1px solid #2a2a3e;border-left:3px solid #4a4a5e;border-radius:2px;transition:all .15s}
+.draft-item .row-main{display:flex;gap:8px;cursor:pointer}
 .draft-item:hover{border-color:#e8475f;border-left-color:#e8475f;background:#1a1218}
 .draft-item.draft{border-left-color:#4a4a5e}
 .draft-item.adopted{border-left-color:#20a050}
-.draft-item.archived{border-left-color:#5a5a6e;opacity:.6}
+.draft-item.archived{border-left-color:#5a5a6e;opacity:.7}
+.draft-item.selected{border-color:#e8475f;background:#1a0a12}
 .draft-title{font-size:12px;color:#c8c8d0;margin-bottom:3px}
 .draft-meta{font-size:10px;color:#6a6a7e;display:flex;gap:8px;flex-wrap:wrap}
 .draft-meta .status{padding:1px 5px;border:1px solid #2a2a3e;border-radius:2px}
+.tier-tag{font-size:9px;padding:1px 5px;border-radius:2px;letter-spacing:1px}
+.tier-easy{background:#0a2a0a;color:#50c070;border:1px solid #205030}
+.tier-standard{background:#0a1a2a;color:#5090d0;border:1px solid #204060}
+.tier-hard{background:#2a1a0a;color:#d09050;border:1px solid #503020}
+.tier-nightmare{background:#2a0a0a;color:#d05050;border:1px solid #502020}
 .filter-row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
 .filter-row select,.filter-row input{flex:1;min-width:80px;padding:4px 8px;font-size:11px}
 .empty-state{padding:30px;text-align:center;color:#4a4a5e;font-size:12px;letter-spacing:1px}
@@ -84,12 +96,63 @@ select{cursor:pointer}
 .level-bar{display:flex;height:6px;margin-top:6px;border-radius:3px;overflow:hidden;background:#1a1a2e}
 .level-bar .seg{flex:1;border-right:1px solid #0a0a0f;background:#1a1a2e}
 .level-bar .seg.active{background:#e8475f}
+.timeline{padding:10px 0 10px 20px;border-left:2px solid #1a1a2e;margin-left:10px}
+.tl-item{position:relative;padding:10px 12px;margin-bottom:10px;background:#12121e;border:1px solid #2a2a3e;border-radius:2px;cursor:pointer;transition:all .15s}
+.tl-item::before{content:"";position:absolute;left:-17px;top:15px;width:10px;height:10px;border-radius:50%;background:#4a4a5e;border:2px solid #1a1a2e}
+.tl-item:hover{border-color:#e8475f;background:#1a1218}
+.tl-item.active::before{background:#e8475f}
+.tl-item.active{border-color:#e8475f}
+.tl-item.gen::before{background:#4a9eff;border-color:#1a1a2e}
+.tl-item.replay::before{background:#f0a030;border-color:#1a1a2e}
+.tl-item.fail::before{background:#c03030;border-color:#1a1a2e}
+.tl-item.reset::before{background:#707080;border-color:#1a1a2e}
+.tl-type{font-size:10px;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px}
+.tl-time{font-size:9px;color:#5a5a6e;float:right}
+.tl-detail{font-size:11px;color:#8a8a9e;margin-top:4px;line-height:1.5}
+.fc-delta{display:inline-block;padding:1px 5px;border-radius:2px;font-size:10px;margin-left:5px}
+.fc-up{background:#2a0a0a;color:#e06060;border:1px solid #502020}
+.fc-down{background:#0a2a0a;color:#60c060;border:1px solid #205020}
+.tl-preview{margin-top:8px;padding:8px;background:#0a0a0f;border-left:2px solid #2a2a3e;font-size:11px;color:#8a8a9e;white-space:pre-wrap;line-height:1.5;max-height:80px;overflow:hidden}
+.panel-toolbar{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;align-items:center}
+.panel-toolbar .spacer{flex:1}
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;margin-bottom:10px}
+.stat-card{padding:8px 10px;background:#12121e;border:1px solid #2a2a3e;border-radius:2px;text-align:center}
+.stat-val{font-size:16px;color:#e8475f;letter-spacing:1px}
+.stat-label{font-size:9px;color:#6a6a7e;margin-top:2px;letter-spacing:1px;text-transform:uppercase}
+.checkbox-select{width:16px;height:16px;accent-color:#e8475f;margin-top:2px}
+.review-section{margin-bottom:12px;padding-bottom:10px;border-bottom:1px dashed #1a1a2e}
+.review-section:last-child{border-bottom:none}
+.review-title{font-size:11px;color:#e8475f;letter-spacing:1px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center}
+.review-title .count{font-size:9px;color:#5a5a6e;letter-spacing:0}
+.source-badge{font-size:9px;padding:1px 4px;border:1px solid #2a2a3e;margin-right:3px;border-radius:2px;color:#5a5a6e}
+.source-badge.hot{border-color:#c05080;color:#c080a0;background:#1a0f15}
+.rate-stars{display:inline-flex;gap:2px;cursor:pointer}
+.rate-stars .star{font-size:14px;color:#3a3a4a;transition:color .1s}
+.rate-stars .star.on{color:#d09050}
+.rate-stars:hover .star.on{color:#d0a060}
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}
+.modal{background:#0e0e18;border:1px solid #2a2a3e;border-radius:2px;max-width:900px;max-height:85vh;overflow:hidden;display:flex;flex-direction:column;width:100%}
+.modal-header{padding:12px 16px;border-bottom:1px solid #2a2a3e;display:flex;justify-content:space-between;align-items:center}
+.modal-header h3{font-size:13px;color:#e8475f;letter-spacing:2px}
+.modal-body{padding:16px;overflow-y:auto;flex:1}
+.close-btn{background:transparent;border:1px solid #4a4a5e;color:#4a4a5e;padding:2px 8px;font-size:11px;cursor:pointer;border-radius:2px;font-family:'Courier New',monospace}
+.close-btn:hover{border-color:#e8475f;color:#e8475f}
+.inline-row{display:flex;gap:6px;align-items:center}
+.inline-row > *{flex:1}
+.tiny{font-size:10px !important;padding:3px 6px !important;margin-top:0 !important}
+.split-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:1100px){.split-cols{grid-template-columns:1fr}}
+.badge{display:inline-block;font-size:9px;padding:1px 5px;border:1px solid #2a2a3e;border-radius:2px;margin-right:3px}
+.badge.hot{border-color:#c05080;color:#c080a0;background:#1a0f15}
+.badge.cold{border-color:#5080a0;color:#80b0d0;background:#0f151a}
+.badge.warn{border-color:#c08030;color:#d09050;background:#1a140a}
+.badge.ok{border-color:#20a050;color:#70c090;background:#0a1a0e}
 </style>
 </head>
 <body>
 <div class="header">
 <h1>☠ 阴间电台谜题服务</h1>
-<p>UNDERWORLD RADIO PUZZLE SERVICE // DEBUG PANEL v1.1</p>
+<p>UNDERWORLD RADIO PUZZLE SERVICE // DEBUG PANEL v2.0</p>
 </div>
 
 <div class="container">
@@ -99,541 +162,832 @@ select{cursor:pointer}
     <label>章节ID</label>
     <input type="text" id="chapterId" value="ch02_hospital" placeholder="例: ch02_hospital">
     <label>当前地图</label>
-    <input type="text" id="currentMap" value="医院B2层停尸间" placeholder="例: 旧校舍3楼">
-    <label>玩家已获得物品 (逗号分隔)</label>
-    <input type="text" id="playerItems" value="生锈的钥匙,旧收音机" placeholder="例: 手电筒,旧钥匙">
-    <label>禁止剧透信息 (逗号分隔)</label>
-    <input type="text" id="forbiddenInfo" value="张医生的真实身份,太平间深处的房间" placeholder="例: 最终Boss名称">
+    <input type="text" id="currentMap" value="医院西楼三层" placeholder="玩家所在的位置">
+    <label>已获得物品（逗号分隔）</label>
+    <textarea id="collectedItems" placeholder="例: 生锈钥匙, 旧照片, 日记残页">生锈的钥匙, 护士站日志, 损坏的门禁卡</textarea>
     <label>谜底类型</label>
-    <div class="radio-group" id="answerTypeGroup">
+    <div class="radio-group">
       <label><input type="radio" name="answerType" value="frequency" checked>频率</label>
       <label><input type="radio" name="answerType" value="date">日期</label>
       <label><input type="radio" name="answerType" value="name">人名</label>
       <label><input type="radio" name="answerType" value="direction">方位</label>
       <label><input type="radio" name="answerType" value="code">代码</label>
     </div>
-    <label>目标平台</label>
-    <div class="radio-group" id="platformGroup">
-      <label><input type="radio" name="platform" value="pc" checked>PC</label>
-      <label><input type="radio" name="platform" value="console">主机</label>
-      <label><input type="radio" name="platform" value="mobile">移动端</label>
-    </div>
-    <label>Session ID (可选，用于持续跟踪)</label>
-    <input type="text" id="sessionId" value="" placeholder="留空则不关联会话">
-    <div class="session-info" id="sessionInfo">未创建会话</div>
-    <button class="btn" onclick="requestPuzzle()">生成谜题</button>
-    <button class="btn secondary" onclick="createSession()">创建会话</button>
-    <button class="btn secondary" onclick="resetSession()">重置会话</button>
+    <label>禁止剧透信息（逗号分隔）</label>
+    <textarea id="forbiddenInfo" placeholder="例: 张医生, 太平间深处的房间, 2005年火灾">张医生的真实身份, 太平间深处的房间, 2005年火灾, 最终BOSS</textarea>
   </div>
 
   <div class="section">
     <div class="section-title">⚙ 难度约束</div>
+    <label>目标平台</label>
+    <div class="radio-group">
+      <label><input type="radio" name="platform" value="pc" checked>PC</label>
+      <label><input type="radio" name="platform" value="console">主机</label>
+      <label><input type="radio" name="platform" value="mobile">移动端</label>
+    </div>
+    <label>难度档（预设）</label>
+    <div class="radio-group">
+      <label><input type="radio" name="tier" value="easy">轻松</label>
+      <label><input type="radio" name="tier" value="standard" checked>标准</label>
+      <label><input type="radio" name="tier" value="hard">硬核</label>
+      <label><input type="radio" name="tier" value="nightmare">噩梦</label>
+    </div>
     <label>线索最少出现次数</label>
-    <input type="number" id="minClueAppearances" value="2" min="1" max="5">
+    <input type="number" id="minClueAppearances" min="1" max="6" value="2">
     <div class="checkbox-row">
-      <input type="checkbox" id="allowReversePlayback" checked>
-      <label for="allowReversePlayback">允许倒放</label>
+      <input type="checkbox" id="allowReversePlayback">
+      <label for="allowReversePlayback">允许倒放线索</label>
     </div>
     <div class="checkbox-row">
       <input type="checkbox" id="requiresPenAndPaper">
       <label for="requiresPenAndPaper">需要纸笔记录</label>
     </div>
-    <label>最大子步骤</label>
-    <input type="number" id="maxSubSteps" value="3" min="1" max="6">
     <div class="checkbox-row">
-      <input type="checkbox" id="allowAudioOnly">
-      <label for="allowAudioOnly">纯音频谜题</label>
+      <input type="checkbox" id="allowAudioOnly" checked>
+      <label for="allowAudioOnly">允许纯音频谜题</label>
     </div>
-    <button class="btn secondary" onclick="applyDifficulty()">应用约束</button>
-    <div class="help-text">选择平台后，超出限制的约束会被自动调整。</div>
+    <label>最大子步骤数</label>
+    <input type="number" id="maxSubSteps" min="1" max="8" value="3">
   </div>
 
   <div class="section">
-    <div class="section-title">🔄 玩家状态适配</div>
-    <label>失败次数 (直接输入也可，无需先建会话)</label>
-    <input type="number" id="failureCount" value="0" min="0" max="20">
-    <div class="level-bar" id="adaptationBar">
-      <div class="seg active"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+    <div class="section-title">🎮 玩家状态适配</div>
+    <label>会话ID（可选，留空不关联）</label>
+    <div class="inline-row">
+      <input type="text" id="sessionIdInput" placeholder="现有 sessionId">
+      <button class="btn tiny secondary" onclick="createNewSession()">新建会话</button>
     </div>
-    <div style="font-size:10px;color:#6a6a7e;margin-top:2px" id="adaptationLabel">Lv0 原始版本</div>
-    <label>强制适配等级 (可选)</label>
-    <select id="forceLevel">
-      <option value="">自动</option>
-      <option value="0">Level 0 - 原始版本</option>
-      <option value="1">Level 1 - 微光版本</option>
-      <option value="2">Level 2 - 回声版本</option>
-      <option value="3">Level 3 - 余烬版本</option>
+    <div id="sessionInfo" class="session-info"></div>
+    <label>失败次数（直接填则不读会话）</label>
+    <input type="number" id="failureCountInput" min="0" max="20" value="0">
+    <div class="level-bar" id="failLevelBar">
+      <div class="seg active"></div>
+      <div class="seg"></div>
+      <div class="seg"></div>
+      <div class="seg"></div>
+    </div>
+    <div id="adaptationInfo" style="font-size:10px;color:#6a6a7e;margin-top:4px">Lv 0 原始版本 · 无失败</div>
+    <label>强制适配等级（调试用）</label>
+    <select id="forceLevelSelect">
+      <option value="">不强制</option>
+      <option value="0">Lv0 原始</option>
+      <option value="1">Lv1 微光</option>
+      <option value="2">Lv2 回声</option>
+      <option value="3">Lv3 余烬</option>
     </select>
-    <button class="btn" onclick="replayPuzzle()">请求重播</button>
-    <button class="btn secondary" onclick="reportFailure()">报告一次失败</button>
-    <button class="btn secondary" onclick="viewAdaptationLevels()">查看等级</button>
+    <button class="btn small" onclick="generatePuzzle()">▶ 生成谜题</button>
+    <button class="btn small secondary" onclick="requestReplay()">↻ 请求重播</button>
+    <button class="btn small secondary" onclick="reportFailure()">✗ 报告失败</button>
+    <button class="btn small secondary" onclick="resetSession()">⟲ 重置会话</button>
   </div>
 </div>
 
 <div class="right">
-  <div class="tabs">
-    <button class="tab active" onclick="switchTab('result')">结果</button>
-    <button class="tab" onclick="switchTab('drafts')">草稿库</button>
-    <button class="tab" onclick="switchTab('raw')">原始JSON</button>
-  </div>
+<div class="tabs">
+  <button class="tab active" data-tab="result" onclick="switchTab('result')">结果视图</button>
+  <button class="tab" data-tab="drafts" onclick="switchTab('drafts')">草稿筛选池</button>
+  <button class="tab" data-tab="timeline" onclick="switchTab('timeline')">会话时间线</button>
+  <button class="tab" data-tab="raw" onclick="switchTab('raw')">原始JSON</button>
+</div>
 
-  <div id="tab-result" class="tab-content active">
-    <div id="resultArea">
-      <div style="color:#4a4a5e;font-size:13px;padding:40px;text-align:center;letter-spacing:1px">
-        ← 填写左侧表单，点击「生成谜题」开始
+<div id="tab-result" class="tab-content active">
+  <div id="draftDetail" style="display:none">
+    <div class="result-box">
+      <div class="tag">草稿详情</div>
+      <div id="draftDetailContent"></div>
+      <div style="margin-top:10px">
+        <button class="btn small" onclick="saveCurrentDraft()">💾 另存副本</button>
+        <button class="btn small secondary" onclick="adoptDraft()">✓ 标记已采用</button>
+        <button class="btn small warn" onclick="archiveDraft()">▣ 归档</button>
+        <button class="btn small danger" onclick="deleteDraft()">✕ 删除</button>
       </div>
     </div>
   </div>
 
-  <div id="tab-drafts" class="tab-content">
-    <div class="section">
-      <div class="section-title">📚 谜题草稿库 <span class="toggle" onclick="refreshDrafts()">刷新</span></div>
-      <div class="filter-row">
-        <select id="filterStatus" onchange="refreshDrafts()">
-          <option value="">全部状态</option>
-          <option value="draft">草稿</option>
-          <option value="adopted">已采用</option>
-          <option value="archived">已归档</option>
-        </select>
-        <select id="filterAnswerType" onchange="refreshDrafts()">
-          <option value="">全部类型</option>
-          <option value="frequency">频率</option>
-          <option value="date">日期</option>
-          <option value="name">人名</option>
-          <option value="direction">方位</option>
-          <option value="code">代码</option>
-        </select>
+  <div id="resultArea" style="display:none">
+    <div class="result-box">
+      <div class="tag" id="adaptationTag">Lv0 原始</div>
+      <div style="font-size:11px;color:#6a6a7e;margin-bottom:8px">
+        <span id="metaInfo"></span>
       </div>
-      <div class="filter-row">
-        <input type="text" id="filterMap" placeholder="按地图搜索..." oninput="debounce(refreshDrafts, 300)">
-        <select id="filterPlatform" onchange="refreshDrafts()">
-          <option value="">全部平台</option>
-          <option value="pc">PC</option>
-          <option value="console">主机</option>
-          <option value="mobile">移动端</option>
-        </select>
-      </div>
-      <div style="font-size:10px;color:#5a5a6e;margin-bottom:6px" id="draftCount">共 0 个草稿</div>
-      <div id="draftsList">
-        <div class="empty-state">加载中...</div>
-      </div>
+      <div class="broadcast-text" id="broadcastText"></div>
     </div>
 
-    <div id="draftDetail" style="display:none">
-      <div class="section">
-        <div class="section-title">📄 草稿详情</div>
-        <div id="draftDetailContent"></div>
-        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn small" onclick="saveCurrentDraft()">保存当前结果为草稿</button>
-          <button class="btn secondary small" onclick="adoptDraft()">标记为已采用</button>
-          <button class="btn secondary small" onclick="archiveDraft()">归档</button>
-          <button class="btn secondary small" onclick="deleteDraft()">删除</button>
-        </div>
-      </div>
+    <div class="result-box">
+      <div class="tag" id="puzzleIdTag"></div>
+      <div class="section-title" style="margin-bottom:10px">🧩 谜底 <span class="toggle" onclick="toggleAnswer()">显示/隐藏</span></div>
+      <div id="answerBox" class="answer-box" style="display:none"></div>
+    </div>
+
+    <div class="result-box">
+      <div class="tag">线索</div>
+      <div class="section-title">🔍 线索列表</div>
+      <div id="cluesList"></div>
+    </div>
+
+    <div class="result-box">
+      <div class="tag">反馈</div>
+      <div class="section-title">❌ 错误反馈</div>
+      <div id="wrongFeedbackList"></div>
+    </div>
+
+    <div class="result-box">
+      <div class="tag">成功</div>
+      <div class="section-title">✓ 成功叙事钩子</div>
+      <div class="hook-text" id="successHookText"></div>
+    </div>
+
+    <div class="result-box">
+      <div class="tag" id="platformTag">PC</div>
+      <div class="section-title">⚙ 约束与平台调整 <span id="adjustmentCount" class="diff-tag warn"></span></div>
+      <div id="platformAdjustments"></div>
+    </div>
+
+    <div class="result-box">
+      <div class="tag" id="spoilerTag">禁用词</div>
+      <div class="section-title">🚫 剧透过滤报告 <span id="spoilerReportTag" class="diff-tag"></span></div>
+      <div id="spoilerReport"></div>
+    </div>
+
+    <div style="margin-bottom:14px">
+      <button class="btn" onclick="saveCurrentDraft()">💾 保存为草稿</button>
+      <button class="btn secondary" onclick="generatePuzzle()">🎲 再生成</button>
+      <button class="btn secondary" onclick="verifyAnswer()">✓ 验证答案</button>
+      <button class="btn secondary" onclick="switchTab('raw')">查看原始JSON</button>
     </div>
   </div>
 
-  <div id="tab-raw" class="tab-content">
-    <div id="rawArea" class="raw-json" style="background:#0e0e18;border:1px solid #2a2a3e;padding:10px;font-size:10px;color:#6a6a7e;white-space:pre-wrap;max-height:calc(100vh - 200px);overflow-y:auto;margin-top:8px">等待请求...</div>
+  <div id="emptyResult" class="empty-state">
+    <div style="font-size:40px;margin-bottom:10px">📻</div>
+    调试面板就绪，请先在左侧填写参数并生成谜题
   </div>
+</div>
+
+<div id="tab-drafts" class="tab-content">
+  <div class="stats-grid" id="draftsStatsGrid"></div>
+  <div class="panel-toolbar">
+    <input type="text" id="draftsSearch" placeholder="🔎 全局搜索（关键词、线索、地图）" style="flex:2;min-width:200px;padding:5px 10px">
+    <button class="btn tiny secondary" onclick="resetDraftFilters()">重置筛选</button>
+    <div class="spacer"></div>
+    <span id="selectedCount" style="font-size:11px;color:#6a6a7e">0 条已选</span>
+    <button class="btn tiny" onclick="batchMark('adopted')" id="batchAdoptBtn" disabled>✓ 批量采用</button>
+    <button class="btn tiny warn" onclick="batchMark('archived')" id="batchArchBtn" disabled>▣ 批量归档</button>
+    <button class="btn tiny danger" onclick="batchDeleteSelected()" id="batchDelBtn" disabled>✕ 批量删除</button>
+  </div>
+  <div class="filter-row">
+    <select id="f_chapterId" onchange="refreshDrafts()"><option value="">全部章节</option></select>
+    <select id="f_map" onchange="refreshDrafts()"><option value="">全部地图</option></select>
+    <select id="f_answerType" onchange="refreshDrafts()"><option value="">全部类型</option>
+      <option value="frequency">频率</option>
+      <option value="date">日期</option>
+      <option value="name">人名</option>
+      <option value="direction">方位</option>
+      <option value="code">代码</option>
+    </select>
+    <select id="f_tier" onchange="refreshDrafts()"><option value="">全部难度</option>
+      <option value="easy">轻松</option>
+      <option value="standard">标准</option>
+      <option value="hard">硬核</option>
+      <option value="nightmare">噩梦</option>
+    </select>
+  </div>
+  <div class="filter-row">
+    <select id="f_platform" onchange="refreshDrafts()"><option value="">全部平台</option>
+      <option value="pc">PC</option>
+      <option value="console">主机</option>
+      <option value="mobile">移动端</option>
+    </select>
+    <select id="f_status" onchange="refreshDrafts()"><option value="">全部状态</option>
+      <option value="draft">草稿</option>
+      <option value="adopted">已采用</option>
+      <option value="archived">已归档</option>
+    </select>
+    <select id="f_sortBy" onchange="refreshDrafts()">
+      <option value="updatedAt">按更新时间</option>
+      <option value="createdAt">按创建时间</option>
+      <option value="difficultyTier">按难度</option>
+      <option value="answerType">按谜底类型</option>
+    </select>
+    <select id="f_sortDir" onchange="refreshDrafts()">
+      <option value="desc">降序</option>
+      <option value="asc">升序</option>
+    </select>
+  </div>
+  <div id="draftsList"></div>
+</div>
+
+<div id="tab-timeline" class="tab-content">
+  <div class="panel-toolbar">
+    <label style="font-size:11px;color:#8a8a9e">会话ID：</label>
+    <input type="text" id="timelineSessionId" style="flex:1">
+    <button class="btn tiny" onclick="refreshTimeline()">刷新时间线</button>
+    <button class="btn tiny secondary" onclick="createNewSession();$('timelineSessionId').value=currentSessionId;refreshTimeline()">新建会话</button>
+  </div>
+  <div id="timelineStats" style="font-size:11px;color:#6a6a7e;margin-bottom:10px"></div>
+  <div class="split-cols" id="timelineContainer" style="display:none">
+    <div>
+      <div class="timeline" id="timelineList"></div>
+    </div>
+    <div id="timelineEventDetail">
+      <div class="result-box">
+        <div class="tag">事件详情</div>
+        <div style="color:#4a4a5e;font-size:11px">点击左侧时间线上的事件查看详情</div>
+      </div>
+    </div>
+  </div>
+  <div id="timelineEmpty" class="empty-state">创建或选择会话ID以查看时间线</div>
+</div>
+
+<div id="tab-raw" class="tab-content">
+  <textarea id="rawArea" style="width:100%;height:80vh;background:#060610;border:1px solid #2a2a3e;color:#8a8a9e;padding:10px;font-family:Consolas,monospace;font-size:11px;border-radius:2px"></textarea>
+</div>
+</div>
+</div>
+
+<div id="draftModal" style="display:none">
+<div class="modal-backdrop" onclick="if(event.target===this)closeDraftModal()">
+<div class="modal">
+  <div class="modal-header">
+    <h3 id="draftModalTitle">草稿详情复核</h3>
+    <button class="close-btn" onclick="closeDraftModal()">✕ 关闭</button>
+  </div>
+  <div class="modal-body" id="draftModalBody"></div>
+</div>
 </div>
 </div>
 
 <div class="status-bar">
   <span id="statusText">就绪</span>
-  <span id="draftBarInfo">草稿: --</span>
-  <span id="lastRequestTime">-</span>
+  <span id="currentSessionLabel">无会话</span>
 </div>
 
 <script>
-const API_BASE = '/api';
+const BASE = '/api';
 let currentResult = null;
-let currentSessionId = null;
 let currentDraftId = null;
-let draftListCache = [];
-let debounceTimer = null;
+let currentSessionId = null;
+let selectedDraftIds = new Set();
+let currentTimelineId = null;
+let answerVisible = false;
 
-function $(id) { return document.getElementById(id); }
+const $ = id => document.getElementById(id);
+
+function escHtml(s) {
+  if (s == null) return '';
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function updateStatus(msg) {
+  $('statusText').textContent = msg + ' · ' + new Date().toLocaleTimeString('zh-CN');
+}
+
 function getRadioValue(name) {
   const el = document.querySelector(`input[name="${name}"]:checked`);
   return el ? el.value : null;
 }
-function escHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
-}
-function debounce(fn, ms) {
-  clearTimeout(debounceTimer);
-  debounceTimer = setTimeout(fn, ms);
-}
 
-function updateStatus(text) { $('statusText').textContent = text; }
-function updateSessionInfo() {
-  const info = $('sessionInfo');
-  if (currentSessionId) {
-    info.textContent = '会话: ' + currentSessionId.substring(0, 8) + '...';
-    info.style.color = '#4a9eff';
-  } else {
-    info.textContent = '未创建会话 (可直接使用失败次数字段)';
-    info.style.color = '#6a6a7e';
+async function apiCall(method, path, body = null) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res = await fetch(BASE + path, opts);
+    const data = await res.json();
+    if (!res.ok) {
+      updateStatus('❌ ' + (data.error || 'Error ' + res.status));
+      return { ok: false, data };
+    }
+    return { ok: true, data };
+  } catch (e) {
+    updateStatus('❌ 网络错误: ' + e.message);
+    return { ok: false, data: null };
   }
 }
 
-function updateAdaptationBar(failureCount) {
-  const level = Math.min(3, Math.floor(failureCount / 2));
-  const segs = document.querySelectorAll('#adaptationBar .seg');
-  segs.forEach((s, i) => {
+function switchTab(name) {
+  document.querySelectorAll('.tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === name);
+  });
+  document.querySelectorAll('.tab-content').forEach(c => {
+    c.classList.toggle('active', c.id === 'tab-' + name);
+  });
+  if (name === 'drafts') refreshDrafts();
+  if (name === 'timeline') {
+    if (currentSessionId) { $('timelineSessionId').value = currentSessionId; refreshTimeline(); }
+  }
+  if (name === 'raw' && currentResult) $('rawArea').textContent = JSON.stringify(currentResult, null, 2);
+}
+
+function updateAdaptationBar() {
+  const fc = parseInt($('failureCountInput').value) || 0;
+  const level = Math.min(3, Math.floor(fc / 2));
+  const labels = ['原始', '微光', '回声', '余烬'];
+  document.querySelectorAll('#failLevelBar .seg').forEach((s, i) => {
     s.classList.toggle('active', i <= level);
   });
-  const labels = ['原始版本', '微光版本', '回声版本', '余烬版本'];
-  $('adaptationLabel').textContent = `Lv${level} ${labels[level]}`;
+  $('adaptationInfo').textContent = `Lv ${level} ${labels[level]}版本 · ${fc}次失败`;
 }
+$('failureCountInput').addEventListener('input', updateAdaptationBar);
+updateAdaptationBar();
 
-async function apiCall(method, path, body) {
-  const start = Date.now();
-  updateStatus('请求中: ' + method + ' ' + path);
-  try {
-    const opts = { method, headers: { 'Content-Type': 'application/json' } };
-    if (body) opts.body = JSON.stringify(body);
-    const res = await fetch(API_BASE + path, opts);
-    const data = await res.json();
-    const elapsed = Date.now() - start;
-    $('lastRequestTime').textContent = elapsed + 'ms';
-    updateStatus(res.ok ? '完成' : '错误 ' + res.status);
-    return { ok: res.ok, data, status: res.status };
-  } catch (e) {
-    updateStatus('网络错误');
-    return { ok: false, data: { error: 'NETWORK_ERROR', message: e.message } };
-  }
-}
+async function generatePuzzle() {
+  updateStatus('正在生成谜题……');
+  const sessionId = $('sessionIdInput').value.trim() || currentSessionId || undefined;
 
-function buildPuzzleRequest() {
-  return {
+  const body = {
     chapterId: $('chapterId').value,
     currentMap: $('currentMap').value,
-    playerItems: $('playerItems').value.split(',').map(s => s.trim()).filter(Boolean),
+    collectedItems: $('collectedItems').value.split(',').map(s => s.trim()).filter(Boolean),
+    answerType: getRadioValue('answerType'),
     forbiddenInfo: $('forbiddenInfo').value.split(',').map(s => s.trim()).filter(Boolean),
-    answerType: getRadioValue('answerType'),
     platform: getRadioValue('platform'),
-    sessionId: currentSessionId || $('sessionId').value || undefined,
-    difficulty: buildDifficulty(),
-    playerState: { failureCount: parseInt($('failureCount').value) || 0 },
+    difficulty: {
+      tier: getRadioValue('tier'),
+      minClueAppearances: parseInt($('minClueAppearances').value) || 2,
+      allowReversePlayback: $('allowReversePlayback').checked,
+      requiresPenAndPaper: $('requiresPenAndPaper').checked,
+      allowAudioOnly: $('allowAudioOnly').checked,
+      maxSubSteps: parseInt($('maxSubSteps').value) || 3,
+      platform: getRadioValue('platform'),
+    },
+    playerState: {
+      failureCount: parseInt($('failureCountInput').value) || 0,
+    },
   };
-}
+  if (sessionId) body.sessionId = sessionId;
+  const forceLevel = $('forceLevelSelect').value;
+  if (forceLevel !== '') body.forceAdaptationLevel = parseInt(forceLevel);
 
-function buildDifficulty() {
-  return {
-    minClueAppearances: parseInt($('minClueAppearances').value) || 2,
-    allowReversePlayback: $('allowReversePlayback').checked,
-    requiresPenAndPaper: $('requiresPenAndPaper').checked,
-    maxSubSteps: parseInt($('maxSubSteps').value) || 3,
-    allowAudioOnly: $('allowAudioOnly').checked,
-    platform: getRadioValue('platform'),
-  };
-}
-
-async function requestPuzzle() {
-  const body = buildPuzzleRequest();
   const { ok, data } = await apiCall('POST', '/puzzle/request', body);
-  currentResult = data;
   if (ok) {
-    renderResult(data);
-    updateAdaptationBar(data.adaptation?.failureCount || 0);
-  } else {
-    renderError(data);
-  }
-  $('rawArea').textContent = JSON.stringify(data, null, 2);
-}
-
-async function createSession() {
-  const { ok, data } = await apiCall('POST', '/session', { chapterId: $('chapterId').value });
-  if (ok) {
-    currentSessionId = data.sessionId;
-    $('sessionId').value = data.sessionId;
-    updateSessionInfo();
-    $('failureCount').value = 0;
-    updateAdaptationBar(0);
-  }
-  $('rawArea').textContent = JSON.stringify(data, null, 2);
-}
-
-async function resetSession() {
-  if (!currentSessionId) {
-    updateStatus('先创建会话');
-    return;
-  }
-  const { ok, data } = await apiCall('POST', `/session/${currentSessionId}/reset`);
-  if (ok) {
-    $('failureCount').value = 0;
-    updateAdaptationBar(0);
-    updateStatus('会话已重置');
-  }
-}
-
-async function applyDifficulty() {
-  const body = {
-    platform: getRadioValue('platform'),
-    overrides: buildDifficulty(),
-    answerType: getRadioValue('answerType'),
-  };
-  const { ok, data } = await apiCall('POST', '/difficulty/apply', body);
-  if (ok && data.constraints) {
-    $('minClueAppearances').value = data.constraints.minClueAppearances;
-    $('allowReversePlayback').checked = data.constraints.allowReversePlayback;
-    $('requiresPenAndPaper').checked = data.constraints.requiresPenAndPaper;
-    $('maxSubSteps').value = data.constraints.maxSubSteps;
-    if (data.adjustments && data.adjustments.length > 0) {
-      updateStatus('已应用 ' + data.adjustments.length + ' 条平台约束');
-    } else {
-      updateStatus('约束已应用，无需调整');
+    currentResult = data;
+    answerVisible = false;
+    if (data.sessionId) {
+      currentSessionId = data.sessionId;
+      $('sessionIdInput').value = currentSessionId;
+      $('currentSessionLabel').textContent = '会话: ' + currentSessionId.slice(0, 8);
     }
+    renderResult(data);
+    $('resultArea').style.display = 'block';
+    $('emptyResult').style.display = 'none';
+    $('rawArea').textContent = JSON.stringify(data, null, 2);
+    updateStatus('✅ 谜题已生成 (失败次数: ' + (data.failureCount || 0) + ')');
   }
-  $('rawArea').textContent = JSON.stringify(data, null, 2);
 }
 
-async function replayPuzzle() {
-  const forceLevel = $('forceLevel').value !== '' ? parseInt($('forceLevel').value) : undefined;
+async function requestReplay() {
+  updateStatus('正在请求重播……');
+  const sessionId = $('sessionIdInput').value.trim() || currentSessionId || undefined;
   const body = {
-    sessionId: currentSessionId || undefined,
-    failureCount: parseInt($('failureCount').value) || 0,
-    forceLevel,
+    sessionId,
+    failureCount: parseInt($('failureCountInput').value) || undefined,
+    forceLevel: $('forceLevelSelect').value !== '' ? parseInt($('forceLevelSelect').value) : undefined,
     puzzleRequest: {
       chapterId: $('chapterId').value,
       currentMap: $('currentMap').value,
-      playerItems: $('playerItems').value.split(',').map(s => s.trim()).filter(Boolean),
-      forbiddenInfo: $('forbiddenInfo').value.split(',').map(s => s.trim()).filter(Boolean),
+      collectedItems: $('collectedItems').value.split(',').map(s => s.trim()).filter(Boolean),
       answerType: getRadioValue('answerType'),
-      platform: getRadioValue('platform'),
+      forbiddenInfo: $('forbiddenInfo').value.split(',').map(s => s.trim()).filter(Boolean),
     },
-    difficulty: buildDifficulty(),
+    difficulty: {
+      platform: getRadioValue('platform'),
+      tier: getRadioValue('tier'),
+      minClueAppearances: parseInt($('minClueAppearances').value) || 2,
+      allowReversePlayback: $('allowReversePlayback').checked,
+      requiresPenAndPaper: $('requiresPenAndPaper').checked,
+      allowAudioOnly: $('allowAudioOnly').checked,
+      maxSubSteps: parseInt($('maxSubSteps').value) || 3,
+    },
   };
   const { ok, data } = await apiCall('POST', '/adaptation/replay', body);
-  currentResult = data;
   if (ok) {
+    currentResult = data;
+    if (data.sessionId) {
+      currentSessionId = data.sessionId;
+      $('sessionIdInput').value = currentSessionId;
+      $('currentSessionLabel').textContent = '会话: ' + currentSessionId.slice(0, 8);
+    }
+    $('failureCountInput').value = data.failureCount;
+    updateAdaptationBar();
     renderResult(data);
-    updateAdaptationBar(data.failureCount || 0);
-  } else {
-    renderError(data);
+    $('resultArea').style.display = 'block';
+    $('emptyResult').style.display = 'none';
+    $('rawArea').textContent = JSON.stringify(data, null, 2);
+    updateStatus('✅ 重播已生成 · 来源: ' + data.failureSource + ' · Lv' + data.adaptationLevel);
   }
-  $('rawArea').textContent = JSON.stringify(data, null, 2);
 }
 
 async function reportFailure() {
+  const sessionId = $('sessionIdInput').value.trim() || currentSessionId || undefined;
   const body = {
-    sessionId: currentSessionId || undefined,
-    currentFailureCount: parseInt($('failureCount').value) || 0,
+    sessionId,
+    currentFailureCount: parseInt($('failureCountInput').value) || 0,
   };
   const { ok, data } = await apiCall('POST', '/adaptation/report-failure', body);
   if (ok) {
-    $('failureCount').value = data.failureCount;
-    updateAdaptationBar(data.failureCount);
-    updateStatus('失败: ' + data.failureCount + '次 | 下次重播: ' + data.nextReplayWillBe);
+    $('failureCountInput').value = data.failureCount;
+    updateAdaptationBar();
+    if (data.sessionId) {
+      currentSessionId = data.sessionId;
+      $('sessionIdInput').value = currentSessionId;
+    }
+    updateStatus('✅ 已报告失败 · 共 ' + data.failureCount + ' 次 · 下次重播: ' + data.nextReplayWillBe);
   }
-  $('rawArea').textContent = JSON.stringify(data, null, 2);
 }
 
-async function viewAdaptationLevels() {
-  const { ok, data } = await apiCall('GET', '/adaptation/levels');
-  $('rawArea').textContent = JSON.stringify(data, null, 2);
+async function verifyAnswer() {
+  if (!currentResult) return;
+  const answer = prompt('输入验证答案（谜底值）:', currentResult.answer?.value || '');
+  if (answer == null) return;
+  const body = {
+    sessionId: currentSessionId,
+    puzzleId: currentResult.puzzleId,
+    answer,
+    _correctAnswer: currentResult.answer,
+  };
+  const { ok, data } = await apiCall('POST', '/puzzle/verify', body);
   if (ok) {
-    let html = '<div class="result-box"><div class="section-title">适配等级一览</div>';
-    data.adaptationLevels.forEach(l => {
-      html += `<div class="clue-item" style="border-left-color:#e8475f">
-        <div style="color:#e8475f;font-size:11px">Level ${l.level} - ${l.label}</div>
-        <div style="font-size:12px;margin-top:4px">${l.description}</div>
-        <div style="font-size:10px;color:#6a6a7e;margin-top:4px">清晰度 ×${l.clarityMultiplier} | 额外线索 +${l.extraClues} | 揭示直接线索: ${l.revealDirectClue ? '是' : '否'} | 进入条件: ${l.minFailures}次失败</div>
-      </div>`;
-    });
-    html += '</div>';
-    $('resultArea').innerHTML = html;
-    switchTab('result');
+    if (data.sessionId) {
+      currentSessionId = data.sessionId;
+      $('sessionIdInput').value = currentSessionId;
+    }
+    if (!data.correct) {
+      $('failureCountInput').value = data.failureCount;
+      updateAdaptationBar();
+    }
+    alert((data.correct ? '✅ 正确！\n' : '❌ 错误！\n') + data.message
+      + (data.nextReplay ? '\n下次重播等级: ' + data.nextReplay.label : ''));
   }
 }
 
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  const tabIdx = ['result', 'drafts', 'raw'].indexOf(tab);
-  document.querySelectorAll('.tab')[tabIdx].classList.add('active');
-  $('tab-' + tab).classList.add('active');
-  if (tab === 'drafts') {
-    refreshDrafts();
+async function createNewSession() {
+  const chapter = prompt('章节ID:', $('chapterId').value);
+  if (!chapter) return;
+  const { ok, data } = await apiCall('POST', '/session', { chapterId: chapter });
+  if (ok) {
+    currentSessionId = data.sessionId;
+    $('sessionIdInput').value = data.sessionId;
+    $('currentSessionLabel').textContent = '会话: ' + data.sessionId.slice(0, 8);
+    $('failureCountInput').value = 0;
+    updateAdaptationBar();
+    updateStatus('✅ 已创建会话 ' + data.sessionId.slice(0, 8));
   }
+}
+
+async function resetSession() {
+  const sid = $('sessionIdInput').value.trim() || currentSessionId;
+  if (!sid) { updateStatus('没有会话可重置'); return; }
+  const { ok } = await apiCall('POST', '/session/' + sid + '/reset');
+  if (ok) {
+    $('failureCountInput').value = 0;
+    updateAdaptationBar();
+    updateStatus('✅ 会话已重置');
+  }
+}
+
+function toggleAnswer() {
+  answerVisible = !answerVisible;
+  $('answerBox').style.display = answerVisible ? 'block' : 'none';
 }
 
 function renderResult(data) {
-  let html = '';
+  $('adaptationTag').textContent = 'Lv' + (data.adaptation?.level ?? data.adaptationLevel ?? 0) + ' ' + (data.adaptation?.name || data.adaptationLabel || '');
+  $('puzzleIdTag').textContent = data.puzzleId ? data.puzzleId.slice(0, 10) : '临时';
+  $('platformTag').textContent = data.platform?.toUpperCase() || 'PC';
 
-  if (data.broadcast) {
-    const tplLabel = data.broadcast.templateLabel || data.broadcast.templateId || 'BROADCAST';
-    html += `<div class="result-box">
-      <div class="tag">${escHtml(tplLabel)}</div>
-      <div class="section-title">📻 电台广播</div>
-      <div class="broadcast-text">${escHtml(data.broadcast.text)}</div>
-    </div>`;
-  }
+  const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
+  const fc = data.failureCount ?? data.playerState?.failureCount ?? 0;
+  $('metaInfo').textContent = [
+    data.chapterId || '-',
+    data.currentMap || '',
+    typeLabels[data.answer?.type] || data.answer?.type || '',
+    '平台: ' + (data.platform || 'pc'),
+    '失败: ' + fc,
+  ].filter(Boolean).join(' · ');
 
-  if (data.answer) {
-    const answerDisplay = typeof data.answer.value === 'object'
-      ? data.answer.display
-      : data.answer.display;
-    html += `<div class="result-box">
-      <div class="section-title">🔑 谜底</div>
-      <div class="answer-box">类型: ${data.answer.type} | 答案: ${escHtml(String(answerDisplay))}</div>
-    </div>`;
-  }
+  const filteredItems = data.spoilerFilter?.filteredItems || [];
+  let bcast = data.broadcast?.text || '';
+  filteredItems.forEach(f => {
+    const r = escHtml(f.replacement);
+    const hl = `<span class="spoiler-highlight" title="${escHtml('原词: ' + f.original)}">${r}</span>`;
+    bcast = bcast.split(f.replacement).join(hl);
+  });
+  $('broadcastText').innerHTML = bcast;
 
-  if (data.spoilerFilter && data.spoilerFilter.applied && data.spoilerFilter.filteredItems?.length > 0) {
-    html += `<div class="result-box">
-      <div class="section-title">🚫 剧透过滤 (${data.spoilerFilter.totalReplacements}处替换)</div>`;
-    data.spoilerFilter.filteredItems.forEach(item => {
-      html += `<div class="spoiler-item">
-        <span class="spoiler-count">×${item.occurrences} 处</span>
-        <span class="spoiler-original">${escHtml(item.original)}</span>
-        <span class="spoiler-replacement">→ ${escHtml(item.replacement)}</span>
-        <span style="font-size:9px;color:#6a6a7e;margin-left:6px">[${item.category}]</span>
-      </div>`;
+  const answer = data.answer;
+  $('answerBox').innerHTML = answer ? `<strong>${answer.type || ''}</strong>: <code>${escHtml(answer.display || answer.value)}</code>` : '-';
+
+  const clues = data.clues || [];
+  $('cluesList').innerHTML = clues.map(c => {
+    let txt = c.text || '';
+    filteredItems.forEach(f => {
+      const r = escHtml(f.replacement);
+      const hl = `<span class="spoiler-highlight" title="${escHtml('原词: ' + f.original)}">${r}</span>`;
+      txt = txt.split(f.replacement).join(hl);
     });
-    html += '</div>';
-  }
-
-  if (data.clues && data.clues.length) {
-    html += `<div class="result-box">
-      <div class="section-title">🔍 线索列表 (${data.clues.length})</div>`;
-    data.clues.forEach(c => {
-      const typeClass = c.type || 'indirect';
-      html += `<div class="clue-item ${typeClass}">
-        <div class="clue-type clue-${typeClass}">${typeClass} · 出现${c.appearances}次</div>
-        ${escHtml(c.text)}
-      </div>`;
-    });
-    html += '</div>';
-  }
-
-  if (data.wrongFeedback && data.wrongFeedback.length) {
-    html += `<div class="result-box">
-      <div class="section-title">❌ 错误答案反馈</div>`;
-    data.wrongFeedback.forEach(f => {
-      html += `<div class="feedback-item">${escHtml(f)}</div>`;
-    });
-    html += '</div>';
-  }
-
-  if (data.successHook) {
-    html += `<div class="result-box">
-      <div class="section-title">🪝 成功叙事钩子</div>
-      <div class="hook-text">${escHtml(data.successHook.text)}</div>
+    const typeClass = `clue-${c.type || 'environmental'}`;
+    return `<div class="clue-item ${c.type || 'environmental'}">
+      <div class="clue-type ${typeClass}">${c.type || 'environmental'} ${c.repetitions > 1 ? '×' + c.repetitions : ''}</div>
+      <div>${txt}</div>
     </div>`;
+  }).join('');
+
+  $('wrongFeedbackList').innerHTML = (data.wrongFeedback || []).map(f =>
+    `<div class="feedback-item">${escHtml(f)}</div>`
+  ).join('') || '<div style="color:#5a5a6e;font-size:11px">无</div>';
+
+  let hk = data.successHook?.text || '';
+  filteredItems.forEach(f => {
+    const r = escHtml(f.replacement);
+    const hl = `<span class="spoiler-highlight" title="${escHtml('原词: ' + f.original)}">${r}</span>`;
+    hk = hk.split(f.replacement).join(hl);
+  });
+  $('successHookText').innerHTML = hk || '—';
+
+  const adj = data.platformAdjustments || [];
+  $('adjustmentCount').textContent = adj.length ? adj.length + ' 项调整' : '';
+  $('adjustmentCount').classList.toggle('warn', adj.length > 0);
+  $('platformAdjustments').innerHTML = adj.length ? adj.map(a => `
+    <div class="adjustment-item">
+      <strong>${escHtml(a.field)}</strong>:
+      <span class="from">${escHtml(String(a.from))}</span> →
+      <span class="to">${escHtml(String(a.to))}</span>
+      <span style="float:right;font-size:10px;color:#5a5a6e">${escHtml(a.reason)}</span>
+    </div>
+  `).join('') : '<div style="color:#5a5a6e;font-size:11px">无调整 · 约束全部符合当前平台</div>';
+
+  renderSpoilerReport(data);
+}
+
+function renderSpoilerReport(data) {
+  const sf = data.spoilerFilter;
+  const fr = sf?.fullReport;
+  if (!sf || !sf.applied) {
+    $('spoilerTag').textContent = '未启用';
+    $('spoilerReportTag').textContent = '0';
+    $('spoilerReport').innerHTML = '<div style="color:#5a5a6e;font-size:11px">未提供禁用词，未启用过滤</div>';
+    return;
   }
 
-  if (data.difficulty || data.adaptation) {
-    html += `<div class="result-box">
-      <div class="section-title">📊 元信息</div>
-      <div class="difficulty-info">`;
-    if (data.difficulty) {
-      html += `<span class="diff-tag">难度标签: ${escHtml(data.difficulty.label || '')}</span>`;
-      html += `<span class="diff-tag">线索≥${data.difficulty.minClueAppearances}次</span>`;
-      html += `<span class="diff-tag">倒放: ${data.difficulty.allowReversePlayback ? '✓' : '✗'}</span>`;
-      html += `<span class="diff-tag">纸笔: ${data.difficulty.requiresPenAndPaper ? '✓' : '✗'}</span>`;
-      html += `<span class="diff-tag">子步骤: ${data.difficulty.maxSubSteps}</span>`;
-    }
-    if (data.adaptation) {
-      html += `<span class="diff-tag">适配: Lv${data.adaptation.adaptationLevel} ${escHtml(data.adaptation.adaptationLabel || '')}</span>`;
-      html += `<span class="diff-tag">失败: ${data.adaptation.failureCount}次</span>`;
-    }
-    if (data.platform) {
-      html += `<span class="diff-tag">平台: ${data.platform}</span>`;
-    }
+  const total = fr?.totalForbidden || 0;
+  const hit = fr?.totalHit || 0;
+  const missed = fr?.totalMissed || 0;
+  const replaced = fr?.totalReplacements || sf.totalReplacements || 0;
+
+  $('spoilerTag').textContent = '共' + total + '条';
+  $('spoilerReportTag').textContent = '命中' + hit + '/替换' + replaced + '处';
+  $('spoilerReportTag').classList.remove('warn');
+  if (missed > 0) $('spoilerReportTag').classList.add('warn');
+
+  const catLabels = { person: '人物', place: '地点', event: '事件', thing: '物品', generic: '通用' };
+  let html = `<div class="difficulty-info">
+    <span class="diff-tag">禁用词总数: ${total}</span>
+    <span class="diff-tag ok" style="border-color:#20a050;color:#70c090">命中过滤: ${hit}</span>
+    ${missed ? `<span class="diff-tag warn">未命中: ${missed}</span>` : ''}
+    <span class="diff-tag hot" style="border-color:#c05080;color:#c080a0">替换位置: ${replaced}</span>
+  </div>`;
+
+  if (fr?.bySource && Object.keys(fr.bySource).length) {
+    html += '<div class="review-section"><div class="review-title">按位置分布</div><div style="font-size:11px">';
+    Object.entries(fr.bySource).forEach(([src, info]) => {
+      const s = info.totalScanned || info.hit?.length || 0;
+      const cls = s ? 'hot' : 'cold';
+      html += `<span class="source-badge ${cls}">${escHtml(src)} ${s}处</span>`;
+    });
     html += '</div></div>';
   }
 
-  if (data.platformAdjustments && data.platformAdjustments.length > 0) {
-    html += `<div class="result-box">
-      <div class="section-title">⚠ 平台约束调整 (${data.platformAdjustments.length})</div>`;
-    data.platformAdjustments.forEach(a => {
-      const fromVal = a.from !== undefined && a.from !== null ? `<span class="from">${escHtml(String(a.from))}</span> → ` : '';
-      const toVal = `<span class="to">${escHtml(String(a.to))}</span>`;
-      html += `<div class="adjustment-item">
-        <strong>${escHtml(a.field)}</strong>: ${fromVal}${toVal}
-        <div style="font-size:10px;color:#6a6a7e;margin-top:2px">${escHtml(a.reason)}</div>
+  if (fr?.hit && fr.hit.length) {
+    html += '<div class="review-section"><div class="review-title">已命中过滤 <span class="count">' + fr.hit.length + ' 条</span></div>';
+    fr.hit.forEach(h => {
+      html += `<div class="spoiler-item">
+        <span class="spoiler-count">×${h.occurrences || 1}</span>
+        <span class="badge" style="border-color:#3a3a4a;color:#8a8a9e">${escHtml(catLabels[h.category] || h.category)}</span>
+        <span class="spoiler-original">${escHtml(h.original)}</span>
+        <span>→</span>
+        <span class="spoiler-replacement">${escHtml(h.replacement)}</span>
+        ${h.matchedSynonyms && h.matchedSynonyms.length ? `<div style="font-size:9px;color:#5a5a6e;margin-top:3px">匹配方式: ${h.matchedSynonyms.map(s => escHtml(s)).join(', ')}</div>` : ''}
+        ${h.sources && h.sources.length ? `<div style="font-size:9px;color:#5a5a6e;margin-top:2px">出现于: ${h.sources.map(s => '<span class="source-badge hot">' + escHtml(s) + '</span>').join('')}</div>` : ''}
       </div>`;
     });
     html += '</div>';
   }
 
-  if (data.platformWarnings && data.platformWarnings.length > 0) {
-    html += `<div class="warning-box">⚠ ${data.platformWarnings.map(escHtml).join('<br>⚠ ')}</div>`;
+  if (fr?.missed && fr.missed.length) {
+    html += '<div class="review-section"><div class="review-title" style="color:#d09050">未命中（未出现在本次生成结果中） <span class="count">' + fr.missed.length + ' 条</span></div>';
+    fr.missed.forEach(m => {
+      html += `<div class="missed-item">⚠ ${escHtml(m)}</div>`;
+    });
+    html += '</div>';
+  } else if (!fr?.hit || !fr.hit.length) {
+    html += '<div style="color:#5a5a6e;font-size:11px;padding:10px 0">本次生成结果未包含禁用内容</div>';
   }
 
-  html += `<div style="text-align:right;margin-top:10px">
-    <button class="btn small" onclick="saveCurrentDraft()">保存为草稿</button>
-  </div>`;
-
-  $('resultArea').innerHTML = html;
+  $('spoilerReport').innerHTML = html;
 }
 
-function renderError(data) {
-  $('resultArea').innerHTML = `<div class="result-box" style="border-color:#5a2020">
-    <div class="section-title" style="color:#c05050">错误</div>
-    <div style="color:#c07070;font-size:13px">${data.error || 'UNKNOWN'}<br>${(data.messages || []).map(escHtml).join('<br>')}</div>
-  </div>`;
+// ====== 草稿库 ======
+function populateFilterSelects() {
+  apiCall('GET', '/drafts/stats').then(r => {
+    if (r.ok) {
+      const stats = r.data;
+      const chapSel = $('f_chapterId');
+      chapSel.innerHTML = '<option value="">全部章节</option>' + Object.keys(stats.byChapter || {}).filter(Boolean).map(k =>
+        `<option value="${escHtml(k)}">${escHtml(k)} (${stats.byChapter[k]})</option>`).join('');
+      const mapSel = $('f_map');
+      mapSel.innerHTML = '<option value="">全部地图</option>' + Object.keys(stats.byMap || {}).filter(Boolean).map(k =>
+        `<option value="${escHtml(k)}">${escHtml(k)} (${stats.byMap[k]})</option>`).join('');
+      renderStatsGrid(stats);
+    }
+  });
+}
+
+function renderStatsGrid(stats) {
+  const cards = [
+    ['总数', stats.total || 0],
+    ['草稿中', stats.byStatus?.draft || 0],
+    ['已采用', stats.byStatus?.adopted || 0],
+    ['已归档', stats.byStatus?.archived || 0],
+  ];
+  if (stats.averageRating) cards.push(['评分', stats.averageRating + '★']);
+  $('draftsStatsGrid').innerHTML = cards.map(([l, v]) =>
+    `<div class="stat-card"><div class="stat-val">${v}</div><div class="stat-label">${l}</div></div>`
+  ).join('');
+}
+
+function resetDraftFilters() {
+  ['f_chapterId','f_map','f_answerType','f_tier','f_platform','f_status','f_sortDir','draftsSearch'].forEach(i => $(i).value = '');
+  $('f_sortBy').value = 'updatedAt';
+  refreshDrafts();
 }
 
 async function refreshDrafts() {
+  populateFilterSelects();
   const params = new URLSearchParams();
-  const status = $('filterStatus').value;
-  const answerType = $('filterAnswerType').value;
-  const map = $('filterMap').value.trim();
-  const platform = $('filterPlatform').value;
-  if (status) params.set('status', status);
-  if (answerType) params.set('answerType', answerType);
-  if (map) params.set('currentMap', map);
-  if (platform) params.set('platform', platform);
-
-  const { ok, data } = await apiCall('GET', '/drafts?' + params.toString());
+  const map = {
+    chapterId: 'f_chapterId',
+    currentMap: 'f_map',
+    answerType: 'f_answerType',
+    difficultyTier: 'f_tier',
+    platform: 'f_platform',
+    status: 'f_status',
+    sortBy: 'f_sortBy',
+    sortDir: 'f_sortDir',
+  };
+  Object.entries(map).forEach(([k, id]) => {
+    const v = $(id).value;
+    if (v) params.append(k, v);
+  });
+  if ($('draftsSearch').value) params.append('search', $('draftsSearch').value);
+  const qs = params.toString();
+  const { ok, data } = await apiCall('GET', '/drafts' + (qs ? '?' + qs : ''));
   if (ok) {
-    draftListCache = data.drafts || [];
-    $('draftCount').textContent = `共 ${data.total} 个草稿`;
-    $('draftBarInfo').textContent = `草稿: ${data.total}`;
+    if (data.stats) renderStatsGrid(data.stats);
     renderDraftsList(data.drafts || []);
+    saveDraftFilters();
   }
+}
+
+$('draftsSearch').addEventListener('input', () => clearTimeout(window._t), window._t = setTimeout(refreshDrafts, 300));
+
+function saveDraftFilters() {
+  const state = {};
+  ['f_chapterId','f_map','f_answerType','f_tier','f_platform','f_status','f_sortBy','f_sortDir','draftsSearch'].forEach(id => {
+    state[id] = $(id).value;
+  });
+  try { localStorage.setItem('drf_filters', JSON.stringify(state)); } catch(e) {}
+}
+
+function loadDraftFilters() {
+  try {
+    const raw = localStorage.getItem('drf_filters');
+    if (!raw) return;
+    const state = JSON.parse(raw);
+    Object.entries(state).forEach(([k, v]) => { if ($(k) && v != null) $(k).value = v; });
+  } catch(e) {}
 }
 
 function renderDraftsList(drafts) {
   if (drafts.length === 0) {
-    $('draftsList').innerHTML = '<div class="empty-state">暂无草稿，先生成并保存一个吧</div>';
+    $('draftsList').innerHTML = '<div class="empty-state">匹配的草稿为空</div>';
+    updateSelectedCount();
     return;
   }
-
   const statusLabels = { draft: '草稿', adopted: '已采用', archived: '已归档' };
   const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
+  const platformLabels = { pc: 'PC', console: '主机', mobile: '移动端' };
+  const tierLabels = { easy: '轻松', standard: '标准', hard: '硬核', nightmare: '噩梦' };
 
   let html = '';
   drafts.forEach(d => {
     const mapText = d.currentMap || '未指定地图';
-    html += `<div class="draft-item ${d.status}" onclick="openDraft('${d.draftId}')">
-      <div class="draft-title">${escHtml(mapText)} · ${escHtml(typeLabels[d.answerType] || d.answerType)}</div>
-      <div class="draft-meta">
-        <span class="status">${escHtml(statusLabels[d.status] || d.status)}</span>
-        <span>${d.platform || 'pc'}</span>
-        <span>Lv${d.difficulty?.level || 0}</span>
-        <span>${new Date(d.updatedAt).toLocaleDateString('zh-CN')}</span>
+    const isSel = selectedDraftIds.has(d.draftId);
+    const stars = (n => {
+      if (!n) return '';
+      let s = '';
+      for (let i = 1; i <= 5; i++) s += `<span class="star ${i <= n ? 'on' : ''}" onclick="event.stopPropagation();rateDraft('${d.draftId}',${i})">★</span>`;
+      return '<span class="rate-stars" onclick="event.stopPropagation()">' + s + '</span>';
+    })(d.qualityRating);
+
+    html += `<div class="draft-item ${d.status} ${isSel ? 'selected' : ''}">
+      <div class="row-main" onclick="toggleSelect('${d.draftId}')">
+        <input type="checkbox" class="checkbox-select" onclick="event.stopPropagation()" ${isSel ? 'checked' : ''}>
       </div>
-      <div style="font-size:10px;color:#5a5a6e;margin-top:4px;line-height:1.4;height:28px;overflow:hidden">${escHtml(d.broadcastPreview || '')}</div>
+      <div class="row-main" style="margin-top:-26px;margin-left:30px;cursor:pointer" onclick="event.stopPropagation();openDraftModal('${d.draftId}')">
+        <div style="flex:1">
+          <div class="draft-title">
+            <span class="tier-tag tier-${d.difficultyTier}">${escHtml(tierLabels[d.difficultyTier] || d.difficultyTier || '—')}</span>
+            ${escHtml(mapText)} · ${escHtml(typeLabels[d.answerType] || d.answerType)}
+            ${stars}
+          </div>
+          <div class="draft-meta">
+            <span class="status">${escHtml(statusLabels[d.status] || d.status)}</span>
+            <span>${escHtml(platformLabels[d.platform] || d.platform)}</span>
+            ${d.hasSpoilerFilter ? `<span class="badge hot">禁${d.spoilerReplacements || 0}</span>` : ''}
+            ${d.platformAdjustmentsCount ? `<span class="badge warn">调${d.platformAdjustmentsCount}</span>` : ''}
+            ${d.answerLength ? `<span class="badge">长${d.answerLength}</span>` : ''}
+            <span>${new Date(d.updatedAt).toLocaleString('zh-CN', { hour12: false })}</span>
+          </div>
+          <div style="font-size:10px;color:#5a5a6e;margin-top:4px;line-height:1.4;height:28px;overflow:hidden">${escHtml(d.broadcastPreview || '')}</div>
+          ${d.tags && d.tags.length ? '<div style="margin-top:3px">' + d.tags.slice(0, 5).map(t => `<span class="diff-tag">${escHtml(t)}</span>`).join('') + '</div>' : ''}
+        </div>
+      </div>
+      <div style="margin-left:30px;margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn tiny secondary" onclick="event.stopPropagation();useDraftAsResult('${d.draftId}')">📥 载入结果</button>
+        <button class="btn tiny" onclick="event.stopPropagation();markStatus('${d.draftId}','adopted')">✓采用</button>
+        <button class="btn tiny warn" onclick="event.stopPropagation();markStatus('${d.draftId}','archived')">▣归档</button>
+        <button class="btn tiny danger" onclick="event.stopPropagation();delDraft('${d.draftId}')">✕</button>
+      </div>
     </div>`;
   });
   $('draftsList').innerHTML = html;
+  updateSelectedCount();
 }
 
-async function openDraft(draftId) {
-  const { ok, data } = await apiCall('GET', '/drafts/' + draftId);
+function toggleSelect(id) {
+  if (selectedDraftIds.has(id)) selectedDraftIds.delete(id);
+  else selectedDraftIds.add(id);
+  refreshDrafts();
+}
+
+function updateSelectedCount() {
+  const n = selectedDraftIds.size;
+  $('selectedCount').textContent = n + ' 条已选';
+  ['batchAdoptBtn','batchArchBtn','batchDelBtn'].forEach(id => $(id).disabled = n === 0);
+}
+
+async function rateDraft(id, rating) {
+  const { ok } = await apiCall('PATCH', '/drafts/' + id + '/rate', { rating });
+  if (ok) { updateStatus('已打分 ' + rating + '★'); refreshDrafts(); }
+}
+
+async function markStatus(id, status) {
+  const { ok } = await apiCall('PATCH', '/drafts/' + id + '/status', { status });
+  if (ok) { updateStatus('已更新状态'); refreshDrafts(); }
+}
+
+async function delDraft(id) {
+  if (!confirm('确认删除这条草稿？')) return;
+  const { ok } = await apiCall('DELETE', '/drafts/' + id);
+  if (ok) { selectedDraftIds.delete(id); updateStatus('已删除'); refreshDrafts(); }
+}
+
+async function batchMark(status) {
+  if (selectedDraftIds.size === 0) return;
+  const { ok, data } = await apiCall('PATCH', '/drafts/batch/status', {
+    draftIds: Array.from(selectedDraftIds), status,
+  });
   if (ok) {
-    currentDraftId = draftId;
+    updateStatus('✅ 已批量' + (status === 'adopted' ? '采用' : '归档') + ' ' + data.updatedCount + ' 条');
+    selectedDraftIds.clear();
+    refreshDrafts();
+  }
+}
+
+async function batchDeleteSelected() {
+  if (selectedDraftIds.size === 0) return;
+  if (!confirm('确认删除选中的 ' + selectedDraftIds.size + ' 条草稿？')) return;
+  const { ok, data } = await apiCall('DELETE', '/drafts/batch', { draftIds: Array.from(selectedDraftIds) });
+  if (ok) {
+    updateStatus('✅ 已删除 ' + data.deletedCount + ' 条');
+    selectedDraftIds.clear();
+    refreshDrafts();
+  }
+}
+
+async function useDraftAsResult(id) {
+  const { ok, data } = await apiCall('GET', '/drafts/' + id);
+  if (ok) {
+    currentDraftId = id;
     currentResult = data;
+    answerVisible = false;
+    renderResult(data);
     $('draftDetail').style.display = 'block';
     renderDraftDetail(data);
-    renderResult(data);
+    $('resultArea').style.display = 'block';
+    $('emptyResult').style.display = 'none';
     $('rawArea').textContent = JSON.stringify(data, null, 2);
     switchTab('result');
   }
@@ -641,49 +995,51 @@ async function openDraft(draftId) {
 
 function renderDraftDetail(draft) {
   const statusLabels = { draft: '草稿', adopted: '已采用', archived: '已归档' };
+  const tierLabels = { easy: '轻松', standard: '标准', hard: '硬核', nightmare: '噩梦' };
+  const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
   let html = `<div style="font-size:12px;margin-bottom:6px">
-    <strong>章节:</strong> ${escHtml(draft.chapterId || '-')}<br>
-    <strong>地图:</strong> ${escHtml(draft.currentMap || '-')}<br>
-    <strong>类型:</strong> ${escHtml(draft.answerType || '-')}<br>
-    <strong>状态:</strong> ${escHtml(statusLabels[draft.status] || draft.status)}<br>
+    <strong>章节:</strong> ${escHtml(draft.chapterId || '-')} &nbsp; | &nbsp;
+    <strong>地图:</strong> ${escHtml(draft.currentMap || '-')} &nbsp; | &nbsp;
+    <strong>类型:</strong> ${escHtml(typeLabels[draft.answerType] || draft.answerType || '-')} &nbsp; | &nbsp;
+    <strong>难度:</strong> <span class="tier-tag tier-${draft.difficultyTier}">${escHtml(tierLabels[draft.difficultyTier] || '-')}</span><br>
+    <strong>状态:</strong> ${escHtml(statusLabels[draft.status] || draft.status)} &nbsp; | &nbsp;
+    <strong>平台:</strong> ${escHtml(draft.platform || '-')} &nbsp; | &nbsp;
     <strong>更新:</strong> ${escHtml(draft.updatedAt || '-')}
   </div>`;
-  if (draft.notes) {
-    html += `<div style="font-size:11px;color:#8a8a9e;padding:6px;background:#12121e;border-radius:2px">${escHtml(draft.notes)}</div>`;
-  }
+  if (draft.notes) html += `<div style="font-size:11px;color:#8a8a9e;padding:6px;background:#12121e;border-radius:2px;margin:6px 0">📝 ${escHtml(draft.notes)}</div>`;
+  if (draft.section) html += `<div style="font-size:11px;color:#6a6a7e">分区: ${escHtml(draft.section)}</div>`;
   if (draft.tags && draft.tags.length > 0) {
     html += '<div style="margin-top:6px">';
-    draft.tags.forEach(t => {
-      html += `<span style="font-size:10px;padding:1px 6px;border:1px solid #2a2a3e;margin-right:4px;color:#6a6a7e">${escHtml(t)}</span>`;
-    });
+    draft.tags.forEach(t => html += `<span class="diff-tag">${escHtml(t)}</span>`);
     html += '</div>';
   }
+  if (draft.qualityRating) html += `<div style="margin-top:6px">★质量评分: ${'★'.repeat(draft.qualityRating)}${'☆'.repeat(5 - draft.qualityRating)}</div>`;
   $('draftDetailContent').innerHTML = html;
 }
 
 async function saveCurrentDraft() {
-  if (!currentResult) {
-    updateStatus('先获取一个谜题结果');
-    return;
-  }
+  if (!currentResult) { updateStatus('先获取一个谜题结果'); return; }
+  const snapshot = currentResult.draftSnapshot || currentResult;
   const body = {
-    puzzleData: currentResult,
+    puzzleData: snapshot,
     meta: {
-      chapterId: $('chapterId').value,
-      currentMap: $('currentMap').value,
+      chapterId: currentResult.chapterId || $('chapterId').value,
+      currentMap: currentResult.currentMap || $('currentMap').value,
       answerType: currentResult.answer?.type,
-      platform: getRadioValue('platform'),
+      platform: currentResult.platform || getRadioValue('platform'),
       difficulty: currentResult.difficulty,
       adaptation: currentResult.adaptation,
       forbiddenInfo: $('forbiddenInfo').value.split(',').map(s => s.trim()).filter(Boolean),
-      filteredSpoilers: currentResult.spoilerFilter?.filteredItems || [],
       notes: '',
+      platformAdjustments: currentResult.platformAdjustments || [],
+      spoilerFilter: currentResult.spoilerFilter || {},
+      difficultyTier: getRadioValue('tier'),
     },
   };
   const { ok, data } = await apiCall('POST', '/drafts', body);
   if (ok) {
     currentDraftId = data.draftId;
-    updateStatus('已保存为草稿');
+    updateStatus('✅ 已保存草稿 ID: ' + data.draftId.slice(0, 8));
     refreshDrafts();
   }
 }
@@ -691,45 +1047,305 @@ async function saveCurrentDraft() {
 async function adoptDraft() {
   if (!currentDraftId) return;
   const { ok } = await apiCall('PATCH', '/drafts/' + currentDraftId + '/status', { status: 'adopted' });
-  if (ok) {
-    updateStatus('标记为已采用');
-    refreshDrafts();
-  }
+  if (ok) { updateStatus('已标记为已采用'); refreshDrafts(); }
 }
 
 async function archiveDraft() {
   if (!currentDraftId) return;
   const { ok } = await apiCall('PATCH', '/drafts/' + currentDraftId + '/status', { status: 'archived' });
-  if (ok) {
-    updateStatus('已归档');
-    refreshDrafts();
-  }
+  if (ok) { updateStatus('已归档'); refreshDrafts(); }
 }
 
 async function deleteDraft() {
-  if (!currentDraftId) return;
-  if (!confirm('确认删除此草稿？')) return;
+  if (!currentDraftId || !confirm('确认删除当前草稿？')) return;
   const { ok } = await apiCall('DELETE', '/drafts/' + currentDraftId);
   if (ok) {
     currentDraftId = null;
     $('draftDetail').style.display = 'none';
-    updateStatus('已删除');
+    updateStatus('已删除草稿');
     refreshDrafts();
   }
 }
 
-$('failureCount').addEventListener('input', function() {
-  updateAdaptationBar(parseInt(this.value) || 0);
-});
+async function openDraftModal(id) {
+  const { ok, data } = await apiCall('GET', '/drafts/' + id);
+  if (!ok) return;
+  currentDraftId = id;
+  renderDraftModal(data);
+  $('draftModal').style.display = 'block';
+}
 
-$('forceLevel').addEventListener('change', function() {
-  if (this.value !== '') {
-    updateAdaptationBar(parseInt(this.value) * 2);
+function closeDraftModal() { $('draftModal').style.display = 'none'; }
+
+function renderDraftModal(d) {
+  const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
+  const tierLabels = { easy: '轻松', standard: '标准', hard: '硬核', nightmare: '噩梦' };
+  const statusLabels = { draft: '草稿', adopted: '已采用', archived: '已归档' };
+  const catLabels = { person: '人物', place: '地点', event: '事件', thing: '物品', generic: '通用' };
+  const platformLabels = { pc: 'PC', console: '主机', mobile: '移动端' };
+
+  $('draftModalTitle').textContent = `${d.chapterId || '草稿'} · ${d.currentMap || ''} · ${typeLabels[d.answerType] || ''}`;
+
+  let html = `<div class="stats-grid">
+    <div class="stat-card"><div class="stat-val">${escHtml(statusLabels[d.status])}</div><div class="stat-label">状态</div></div>
+    <div class="stat-card"><div class="stat-val"><span class="tier-tag tier-${d.difficultyTier}">${escHtml(tierLabels[d.difficultyTier] || '-')}</span></div><div class="stat-label">难度</div></div>
+    <div class="stat-card"><div class="stat-val">${escHtml(platformLabels[d.platform] || '-')}</div><div class="stat-label">平台</div></div>
+    <div class="stat-card"><div class="stat-val">${d.answerLength || 0}</div><div class="stat-label">谜底长度</div></div>
+    <div class="stat-card"><div class="stat-val">${(d.spoilerFilter?.totalReplacements || 0) + (d.platformAdjustments?.length || 0)}</div><div class="stat-label">处理项</div></div>
+  </div>`;
+
+  html += `<div class="review-section"><div class="review-title">📡 电台广播</div>
+    <div class="broadcast-text" style="background:#0a0a0f;padding:10px;border-left:2px solid #4a9eff">${escHtml(d.broadcast?.text || '')}</div></div>`;
+
+  html += `<div class="review-section"><div class="review-title">🧩 线索列表</div>`;
+  (d.clues || []).forEach(c => {
+    const tcls = `clue-${c.type || 'environmental'}`;
+    html += `<div class="clue-item ${c.type || ''}">
+      <div class="clue-type ${tcls}">${c.type || ''} ${c.repetitions > 1 ? '×' + c.repetitions : ''}</div>
+      <div>${escHtml(c.text || '')}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  html += `<div class="review-section"><div class="review-title">🎯 谜底</div>
+    <div class="answer-box">${escHtml(d.answerDisplay || d.answer?.value || '')}
+      <span style="float:right;font-size:10px;color:#5a5a6e">${escHtml(typeLabels[d.answerType] || d.answerType)}</span></div></div>`;
+
+  const adj = d.platformAdjustments || [];
+  if (adj.length) {
+    html += `<div class="review-section"><div class="review-title">⚙ 平台约束调整 <span class="count">${adj.length} 项</span></div>`;
+    adj.forEach(a => {
+      html += `<div class="adjustment-item"><strong>${escHtml(a.field)}</strong>:
+        <span class="from">${escHtml(String(a.from))}</span> →
+        <span class="to">${escHtml(String(a.to))}</span>
+        <span style="float:right;font-size:10px;color:#5a5a6e">${escHtml(a.reason)}</span></div>`;
+    });
+    html += '</div>';
+  } else {
+    html += `<div class="review-section"><div class="review-title">⚙ 平台约束</div>
+      <div style="font-size:11px;color:#70c090;padding:6px;background:#0a1a0e;border-radius:2px">✓ 全部约束符合当前平台</div></div>`;
+  }
+
+  const sf = d.spoilerFilter;
+  if (sf?.applied && sf.fullReport) {
+    const fr = sf.fullReport;
+    html += `<div class="review-section"><div class="review-title">🚫 剧透过滤报告
+      <span class="count">命中${fr.totalHit}/${fr.totalForbidden}，替换${fr.totalReplacements}处</span></div>`;
+
+    if (fr.bySource) {
+      html += '<div style="font-size:10px;margin-bottom:6px">分布: ';
+      Object.entries(fr.bySource).forEach(([src, info]) => {
+        const c = info.totalScanned || info.hit?.length || 0;
+        html += `<span class="badge ${c ? 'hot' : 'cold'}">${escHtml(src)} ${c}处</span>`;
+      });
+      html += '</div>';
+    }
+
+    if (fr.hit && fr.hit.length) {
+      html += '<div style="margin-top:4px">';
+      fr.hit.forEach(h => {
+        html += `<div class="spoiler-item">
+          <span class="spoiler-count">×${h.occurrences || 1}</span>
+          <span class="diff-tag" style="color:#6a6a7e">${escHtml(catLabels[h.category] || h.category)}</span>
+          <span class="spoiler-original">${escHtml(h.original)}</span>
+          → <span class="spoiler-replacement">${escHtml(h.replacement)}</span>
+          ${h.sources ? `<div style="font-size:9px;color:#5a5a6e;margin-top:2px">出现于: ${h.sources.map(s => '<span class="source-badge hot">' + escHtml(s) + '</span>').join('')}</div>` : ''}
+          ${h.matchedSynonyms?.length ? `<div style="font-size:9px;color:#4a4a5e;margin-top:2px">匹配方式: ${h.matchedSynonyms.map(s => escHtml(s)).join(', ')}</div>` : ''}
+        </div>`;
+      });
+      html += '</div>';
+    }
+
+    if (fr.missed?.length) {
+      html += '<div style="margin-top:8px">';
+      html += '<div style="font-size:10px;color:#d09050;margin-bottom:4px">未命中（本次未出现，无需替换）:</div>';
+      fr.missed.forEach(m => html += `<div class="missed-item">${escHtml(m)}</div>`);
+      html += '</div>';
+    }
+    html += '</div>';
+  } else if (sf?.applied) {
+    html += `<div class="review-section"><div class="review-title">🚫 剧透过滤 <span class="count">未出现在结果中</span></div>
+      <div style="font-size:11px;color:#8a8a9e">启用过滤但禁用词未命中本次生成内容</div></div>`;
+  }
+
+  html += `<div class="review-section"><div class="review-title">📎 元数据</div>
+    <div style="font-size:11px;color:#8a8a9e;line-height:1.8">
+      <div>📅 创建: ${escHtml(d.createdAt || '-')}</div>
+      <div>🔄 更新: ${escHtml(d.updatedAt || '-')}</div>
+      <div>🏷 标签: ${d.tags?.length ? d.tags.map(t => `<span class="diff-tag">${escHtml(t)}</span>`).join(' ') : '无'}</div>
+      <div>📝 备注: ${escHtml(d.notes || '无')}</div>
+      <div>🧠 禁用词清单: ${d.forbiddenInfo?.length ? d.forbiddenInfo.map(t => `<span class="diff-tag warn">${escHtml(t)}</span>`).join(' ') : '无'}</div>
+    </div></div>`;
+
+  html += `<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
+    <button class="btn" onclick="useDraftAsResult('${d.draftId}');closeDraftModal()">📥 载入结果</button>
+    <button class="btn secondary" onclick="markStatus('${d.draftId}','adopted');refreshDrafts();closeDraftModal()">✓ 标记采用</button>
+    <button class="btn warn" onclick="markStatus('${d.draftId}','archived');refreshDrafts();closeDraftModal()">▣ 归档</button>
+    <button class="btn danger" onclick="if(confirm('删除？')){delDraft('${d.draftId}');closeDraftModal()}">✕ 删除</button>
+  </div>`;
+
+  $('draftModalBody').innerHTML = html;
+}
+
+// ====== 会话时间线 ======
+async function refreshTimeline() {
+  const sid = $('timelineSessionId').value.trim() || currentSessionId;
+  if (!sid) { updateStatus('请先填写或创建会话ID'); return; }
+  $('timelineSessionId').value = sid;
+  const { ok, data } = await apiCall('GET', '/session/' + sid + '/timeline');
+  if (!ok) return;
+  renderTimeline(data.timeline || [], data.sessionId);
+  const info = (await apiCall('GET', '/session/' + sid));
+  if (info.ok) {
+    $('timelineStats').textContent = `会话 ${sid.slice(0, 8)}… · 当前失败 ${info.data.playerState?.failureCount || 0} · ${info.data.puzzles?.length || 0} 个谜题 · ${data.timeline.length} 条事件`;
+  }
+}
+
+function renderTimeline(events, sid) {
+  if (!events.length) {
+    $('timelineEmpty').style.display = 'block';
+    $('timelineContainer').style.display = 'none';
+    return;
+  }
+  $('timelineEmpty').style.display = 'none';
+  $('timelineContainer').style.display = 'grid';
+
+  const typeLabels = {
+    session_created: ['创建会话', ''],
+    puzzle_generated: ['生成谜题', 'gen'],
+    replay_requested: ['请求重播', 'replay'],
+    attempt_recorded: ['答案尝试', 'fail'],
+    failure_reported: ['报告失败', 'fail'],
+    player_state_updated: ['玩家状态更新', ''],
+    session_reset: ['重置会话', 'reset'],
+  };
+
+  const html = events.map(ev => {
+    const [label, cls] = typeLabels[ev.type] || [ev.type, ''];
+    let detail = '';
+    let preview = '';
+
+    if (ev.type === 'puzzle_generated') {
+      detail = `第 #${(ev.puzzleIndex ?? 0) + 1} 个谜题 · ${ev.answerType || ''}
+失败次数: ${ev.failureCountAtGen} · 适配 Lv${ev.adaptationLevel ?? 0} · ${ev.platform || ''}`;
+      if (ev.broadcastSnapshot) {
+        preview = (ev.broadcastSnapshot.text || '').slice(0, 100);
+      }
+    } else if (ev.type === 'replay_requested') {
+      detail = `谜题 #${(ev.puzzleIndex ?? 0) + 1} · 适配 Lv${ev.adaptationLevel ?? 0}
+失败次数: ${ev.failureCount ?? 0}`;
+      if (ev.replayBroadcast) preview = (ev.replayBroadcast.text || '').slice(0, 100);
+    } else if (ev.type === 'attempt_recorded') {
+      detail = `谜题 #${(ev.puzzleIndex ?? 0) + 1} · ${ev.correct ? '✅ 正确' : '❌ 错误'}
+答案: ${JSON.stringify(ev.answer)}`;
+      if (ev.deltaFailure) {
+        detail += `<span class="fc-delta fc-up">失败 +${ev.deltaFailure}</span>`;
+      }
+    } else if (ev.type === 'failure_reported') {
+      detail = `失败 ${ev.beforeFailure} → ${ev.afterFailure}
+<span class="fc-delta fc-up">+${ev.delta || 1}</span>
+原因: ${ev.reason || 'manual'}`;
+    } else if (ev.type === 'player_state_updated') {
+      detail = `失败次数 ${ev.beforeFailure} → ${ev.afterFailure}`;
+    } else if (ev.type === 'session_created') {
+      detail = `章节: ${ev.chapterId || '-'}`;
+    } else if (ev.type === 'session_reset') {
+      detail = `重置失败次数 ${ev.beforeFailure} → ${ev.afterFailure}`;
+    }
+
+    return `<div class="tl-item ${cls} ${currentTimelineId === ev.id ? 'active' : ''}" onclick="showTimelineEvent('${ev.id}', this)">
+      <div>
+        <span class="tl-type">${label}</span>
+        <span class="tl-time">${new Date(ev.timestamp).toLocaleTimeString('zh-CN', { hour12: false })}</span>
+      </div>
+      <div class="tl-detail">${detail}</div>
+      ${preview ? `<div class="tl-preview">📻 ${escHtml(preview)}…</div>` : ''}
+    </div>`;
+  }).join('');
+
+  $('timelineList').innerHTML = html;
+}
+
+async function showTimelineEvent(eventId, el) {
+  currentTimelineId = eventId;
+  document.querySelectorAll('.tl-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  const sid = $('timelineSessionId').value.trim();
+  const { ok, data } = await apiCall('GET', '/session/' + sid + '/timeline/' + eventId);
+  if (!ok) return;
+  renderTimelineEventDetail(data);
+}
+
+function renderTimelineEventDetail(ev) {
+  const typeLabels = {
+    session_created: '创建会话',
+    puzzle_generated: '生成谜题',
+    replay_requested: '请求重播',
+    attempt_recorded: '答案尝试',
+    failure_reported: '报告失败',
+    player_state_updated: '玩家状态更新',
+    session_reset: '重置会话',
+  };
+
+  let html = `<div class="result-box"><div class="tag">${escHtml(ev.id.slice(0, 8))}</div>
+    <div style="font-size:12px;margin-bottom:8px">
+      <strong>${escHtml(typeLabels[ev.type] || ev.type)}</strong><br>
+      <span style="color:#5a5a6e;font-size:10px">${escHtml(ev.timestamp)}</span>
+    </div>`;
+
+  const snap = ev.broadcastSnapshot || ev.replayBroadcast;
+  if (snap) {
+    html += `<div class="review-section"><div class="review-title">📻 当时广播</div>
+      <div class="broadcast-text" style="background:#0a0a0f;padding:10px;border-left:2px solid #4a9eff;font-size:12px">${escHtml(snap.text || '')}</div></div>`;
+    if (snap.clues?.length) {
+      html += `<div class="review-section"><div class="review-title">🔍 当时线索</div>`;
+      snap.clues.forEach(c => {
+        html += `<div class="clue-item ${c.type || ''}">
+          <div class="clue-type clue-${c.type || 'environmental'}">${c.type || ''}</div>
+          <div>${escHtml(c.text || '')}</div></div>`;
+      });
+      html += '</div>';
+    }
+    html += `<div class="review-section"><div class="review-title">📶 适配等级</div>
+      <div class="answer-box" style="color:#8ab4f8">Lv ${snap.adaptationLevel ?? 0} · ${escHtml(snap.adaptationName || '')}</div></div>`;
+  }
+
+  if (ev.type === 'attempt_recorded') {
+    html += `<div class="review-section"><div class="review-title">🎯 验证结果</div>
+      <div class="${ev.correct ? 'hook-text' : 'feedback-item'}" style="line-height:1.8">
+        玩家输入: <code>${escHtml(JSON.stringify(ev.answer))}</code><br>
+        结果: ${ev.correct ? '<span style="color:#70c090">✅ 正确</span>' : '<span style="color:#e07070">❌ 错误</span>'}<br>
+        失败次数变化: ${ev.beforeFailure} → ${ev.afterFailure}
+        ${ev.deltaFailure ? `<span class="fc-delta fc-up">+${ev.deltaFailure}</span>` : ''}
+      </div></div>`;
+  }
+
+  if (ev.type === 'failure_reported') {
+    html += `<div class="review-section"><div class="review-title">📊 失败次数变化</div>
+      <div class="feedback-item">
+        ${ev.beforeFailure} 次 → ${ev.afterFailure} 次 <span class="fc-delta fc-up">+${ev.delta}</span><br>
+        触发原因: ${escHtml(ev.reason || 'manual')}
+      </div></div>`;
+  }
+
+  // All fields dump
+  html += `<div class="review-section"><div class="review-title">📋 完整数据</div>
+    <pre style="background:#060610;padding:8px;font-size:10px;color:#6a6a7e;border-radius:2px;overflow:auto;max-height:300px">${escHtml(JSON.stringify(ev, null, 2))}</pre></div>`;
+
+  html += '</div>';
+  $('timelineEventDetail').innerHTML = html;
+}
+
+// ====== 初始化 ======
+document.addEventListener('DOMContentLoaded', () => {
+  loadDraftFilters();
+  populateFilterSelects();
+  if (currentSessionId) {
+    $('sessionIdInput').value = currentSessionId;
+    $('timelineSessionId').value = currentSessionId;
+    $('currentSessionLabel').textContent = '会话: ' + currentSessionId.slice(0, 8);
   }
 });
-
-updateSessionInfo();
-updateAdaptationBar(0);
 </script>
 </body>
 </html>

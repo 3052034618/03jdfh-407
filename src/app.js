@@ -4,7 +4,7 @@ const puzzleRoute = require('./modules/puzzle/route');
 const difficultyRoute = require('./modules/difficulty/route');
 const adaptationRoute = require('./modules/adaptation/route');
 const draftsRoute = require('./modules/drafts/route');
-const { createSession, getSession, resetSession, listSessions } = require('./store/sessionStore');
+const { createSession, getSession, resetSession, listSessions, getSessionTimeline, getTimelineEvent } = require('./store/sessionStore');
 
 const app = express();
 const PORT = process.env.PORT || 3077;
@@ -74,6 +74,32 @@ app.post('/api/session/:sessionId/reset', (req, res) => {
 
 app.get('/api/sessions', (req, res) => {
   res.json({ sessions: listSessions() });
+});
+
+app.get('/api/session/:sessionId/timeline', (req, res) => {
+  const timeline = getSessionTimeline(req.params.sessionId);
+  if (!timeline) {
+    return res.status(404).json({
+      error: 'SESSION_NOT_FOUND',
+      messages: ['No session found with the given sessionId'],
+    });
+  }
+  res.json({
+    sessionId: req.params.sessionId,
+    eventCount: timeline.length,
+    timeline,
+  });
+});
+
+app.get('/api/session/:sessionId/timeline/:eventId', (req, res) => {
+  const event = getTimelineEvent(req.params.sessionId, req.params.eventId);
+  if (!event) {
+    return res.status(404).json({
+      error: 'EVENT_NOT_FOUND',
+      messages: ['Timeline event not found'],
+    });
+  }
+  res.json(event);
 });
 
 app.get('/api/health', (req, res) => {
