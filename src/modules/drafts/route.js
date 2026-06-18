@@ -59,32 +59,37 @@ router.get('/', (req, res) => {
   const drafts = listDrafts(filters);
   const stats = getDraftStats();
 
-  const summary = drafts.map(d => ({
-    draftId: d.draftId,
-    chapterId: d.chapterId,
-    currentMap: d.currentMap,
-    answerType: d.answerType,
-    answerDisplay: d.answerDisplay,
-    answerLength: d.answerLength,
-    difficultyTier: d.difficultyTier,
-    status: d.status,
-    platform: d.platform,
-    tags: d.tags,
-    notes: d.notes,
-    section: d.section,
-    difficulty: d.difficulty,
-    adaptation: d.adaptation,
-    hasSpoilerFilter: d.spoilerFilter?.applied === true,
-    spoilerReplacements: d.spoilerFilter?.totalReplacements || 0,
-    platformAdjustmentsCount: (d.platformAdjustments || []).length,
-    broadcastPreview: d.broadcast?.text
-      ? d.broadcast.text.substring(0, 100) + (d.broadcast.text.length > 100 ? '...' : '')
-      : '',
-    answer: d.answer,
-    qualityRating: d.qualityRating,
-    createdAt: d.createdAt,
-    updatedAt: d.updatedAt,
-  }));
+  const summary = drafts.map(d => {
+    const hasSF = d.spoilerFilter?.applied === true || (d.spoilerFilter?.fullReport && d.spoilerFilter.fullReport.totalReplacements > 0);
+    const totalRepl = d.spoilerFilter?.totalReplacements || d.spoilerFilter?.fullReport?.totalReplacements || 0;
+    const adj = Array.isArray(d.platformAdjustments) ? d.platformAdjustments : [];
+    return {
+      draftId: d.draftId,
+      chapterId: d.chapterId,
+      currentMap: d.currentMap,
+      answerType: d.answerType,
+      answerDisplay: d.answerDisplay,
+      answerLength: d.answerLength,
+      difficultyTier: d.difficultyTier,
+      status: d.status,
+      platform: d.platform,
+      tags: d.tags,
+      notes: d.notes,
+      section: d.section,
+      difficulty: d.difficulty,
+      adaptation: d.adaptation,
+      hasSpoilerFilter: !!(hasSF),
+      spoilerReplacements: totalRepl,
+      platformAdjustmentsCount: adj.length,
+      broadcastPreview: d.broadcast?.text
+        ? d.broadcast.text.substring(0, 100) + (d.broadcast.text.length > 100 ? '...' : '')
+        : '',
+      answer: d.answer,
+      qualityRating: d.qualityRating,
+      createdAt: d.createdAt,
+      updatedAt: d.updatedAt,
+    };
+  });
 
   res.json({
     total: summary.length,
@@ -96,6 +101,53 @@ router.get('/', (req, res) => {
 
 router.get('/stats', (req, res) => {
   res.json(getDraftStats());
+});
+
+router.patch('/batch/status', (req, res) => {
+  const { draftIds, status } = req.body;
+  if (!Array.isArray(draftIds) || !status) {
+    return res.status(400).json({
+      error: 'INVALID_REQUEST',
+      messages: ['draftIds (array) and status are required'],
+    });
+  }
+  const count = batchUpdateStatus(draftIds, status);
+  res.json({
+    success: true,
+    updatedCount: count,
+    status,
+  });
+});
+
+router.patch('/batch/tags', (req, res) => {
+  const { draftIds, tags } = req.body;
+  if (!Array.isArray(draftIds) || !Array.isArray(tags)) {
+    return res.status(400).json({
+      error: 'INVALID_REQUEST',
+      messages: ['draftIds (array) and tags (array) are required'],
+    });
+  }
+  const count = batchAddTags(draftIds, tags);
+  res.json({
+    success: true,
+    updatedCount: count,
+    tagsAdded: tags,
+  });
+});
+
+router.delete('/batch', (req, res) => {
+  const { draftIds } = req.body;
+  if (!Array.isArray(draftIds)) {
+    return res.status(400).json({
+      error: 'INVALID_REQUEST',
+      messages: ['draftIds (array) is required'],
+    });
+  }
+  const count = batchDeleteDraft(draftIds);
+  res.json({
+    success: true,
+    deletedCount: count,
+  });
 });
 
 router.get('/:draftId', (req, res) => {
@@ -194,53 +246,6 @@ router.patch('/:draftId/rate', (req, res) => {
     });
   }
   res.json({ success: true, qualityRating: draft.qualityRating });
-});
-
-router.patch('/batch/status', (req, res) => {
-  const { draftIds, status } = req.body;
-  if (!Array.isArray(draftIds) || !status) {
-    return res.status(400).json({
-      error: 'INVALID_REQUEST',
-      messages: ['draftIds (array) and status are required'],
-    });
-  }
-  const count = batchUpdateStatus(draftIds, status);
-  res.json({
-    success: true,
-    updatedCount: count,
-    status,
-  });
-});
-
-router.patch('/batch/tags', (req, res) => {
-  const { draftIds, tags } = req.body;
-  if (!Array.isArray(draftIds) || !Array.isArray(tags)) {
-    return res.status(400).json({
-      error: 'INVALID_REQUEST',
-      messages: ['draftIds (array) and tags (array) are required'],
-    });
-  }
-  const count = batchAddTags(draftIds, tags);
-  res.json({
-    success: true,
-    updatedCount: count,
-    tagsAdded: tags,
-  });
-});
-
-router.delete('/batch', (req, res) => {
-  const { draftIds } = req.body;
-  if (!Array.isArray(draftIds)) {
-    return res.status(400).json({
-      error: 'INVALID_REQUEST',
-      messages: ['draftIds (array) is required'],
-    });
-  }
-  const count = batchDeleteDraft(draftIds);
-  res.json({
-    success: true,
-    deletedCount: count,
-  });
 });
 
 module.exports = router;

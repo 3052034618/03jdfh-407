@@ -147,6 +147,20 @@ select{cursor:pointer}
 .badge.cold{border-color:#5080a0;color:#80b0d0;background:#0f151a}
 .badge.warn{border-color:#c08030;color:#d09050;background:#1a140a}
 .badge.ok{border-color:#20a050;color:#70c090;background:#0a1a0e}
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:10px}
+.compare-col{background:#0a0a10;border:1px solid #2a2a3e;padding:10px;border-radius:2px;overflow-y:auto;max-height:70vh}
+.compare-col.selected{border-color:#20a050;background:#0a1510}
+.compare-col.rejected{border-color:#605050;opacity:.6}
+.compare-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed #1a1a2e}
+.compare-title{font-size:11px;color:#c8c8d0;letter-spacing:1px}
+.decision-btn{padding:3px 8px;font-size:10px;border:1px solid #2a2a3e;color:#6a6a7e;background:transparent;cursor:pointer;font-family:'Courier New',monospace;border-radius:2px;margin-left:3px}
+.decision-btn.active-adopt{border-color:#20a050;color:#70c090;background:#0a1a0e}
+.decision-btn.active-archive{border-color:#c08030;color:#d09050;background:#1a140a}
+.empty-actions{margin-top:10px;display:flex;gap:6px;justify-content:center}
+.event-card-meta{display:flex;gap:5px;flex-wrap:wrap;margin-top:4px}
+.fc-badge{font-size:9px;padding:1px 5px;border:1px solid #3a3a5a;border-radius:2px;color:#8ab4f8;background:#0a1018}
+.level-badge{font-size:9px;padding:1px 5px;border:1px solid #504060;border-radius:2px;color:#c090e0;background:#140a1a}
+.consistency-warn{background:#1a0a0a;border:1px solid #503030;color:#d07070;padding:6px 10px;margin:6px 0;font-size:11px;border-radius:2px}
 </style>
 </head>
 <body>
@@ -328,8 +342,10 @@ select{cursor:pointer}
   <div class="panel-toolbar">
     <input type="text" id="draftsSearch" placeholder="🔎 全局搜索（关键词、线索、地图）" style="flex:2;min-width:200px;padding:5px 10px">
     <button class="btn tiny secondary" onclick="resetDraftFilters()">重置筛选</button>
+    <button class="btn tiny secondary" onclick="clearAllDraftFilters()">🗑 清空条件</button>
     <div class="spacer"></div>
     <span id="selectedCount" style="font-size:11px;color:#6a6a7e">0 条已选</span>
+    <button class="btn tiny secondary" onclick="openCompareModal()" id="compareBtn" disabled>⇆ 对比 (0/3)</button>
     <button class="btn tiny" onclick="batchMark('adopted')" id="batchAdoptBtn" disabled>✓ 批量采用</button>
     <button class="btn tiny warn" onclick="batchMark('archived')" id="batchArchBtn" disabled>▣ 批量归档</button>
     <button class="btn tiny danger" onclick="batchDeleteSelected()" id="batchDelBtn" disabled>✕ 批量删除</button>
@@ -406,15 +422,35 @@ select{cursor:pointer}
 
 <div id="draftModal" style="display:none">
 <div class="modal-backdrop" onclick="if(event.target===this)closeDraftModal()">
-<div class="modal">
+<div class="modal" style="max-width:1000px">
   <div class="modal-header">
     <h3 id="draftModalTitle">草稿详情复核</h3>
-    <button class="close-btn" onclick="closeDraftModal()">✕ 关闭</button>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn tiny secondary" onclick="copyReviewText()">📋 复制评审文本</button>
+      <button class="close-btn" onclick="closeDraftModal()">✕ 关闭</button>
+    </div>
   </div>
   <div class="modal-body" id="draftModalBody"></div>
 </div>
 </div>
 </div>
+
+<div id="compareModal" style="display:none">
+<div class="modal-backdrop" onclick="if(event.target===this)closeCompareModal()">
+<div class="modal" style="max-width:1600px;width:98vw">
+  <div class="modal-header">
+    <h3>候选谜题对比复核（最多 3 条并排）</h3>
+    <div style="display:flex;gap:6px;align-items:center">
+      <button class="btn tiny" onclick="applyCompareDecisions()">✓ 应用决策</button>
+      <button class="close-btn" onclick="closeCompareModal()">✕ 关闭</button>
+    </div>
+  </div>
+  <div class="modal-body" id="compareBody"></div>
+</div>
+</div>
+</div>
+
+<div id="toast" style="position:fixed;top:20px;right:20px;background:#1a1a2e;border:1px solid #e8475f;color:#e8475f;padding:8px 16px;font-size:12px;z-index:9999;display:none;border-radius:2px;letter-spacing:1px"></div>
 
 <div class="status-bar">
   <span id="statusText">就绪</span>
@@ -793,12 +829,19 @@ function populateFilterSelects() {
   apiCall('GET', '/drafts/stats').then(r => {
     if (r.ok) {
       const stats = r.data;
+      const saved = (() => { try { return JSON.parse(localStorage.getItem('drf_filters') || '{}'); } catch(e) { return {}; } })();
+
+      const savedChapters = Object.keys(stats.byChapter || {}).filter(Boolean);
+      if (saved.f_chapterId && !savedChapters.includes(saved.f_chapterId)) savedChapters.unshift(saved.f_chapterId);
       const chapSel = $('f_chapterId');
-      chapSel.innerHTML = '<option value="">全部章节</option>' + Object.keys(stats.byChapter || {}).filter(Boolean).map(k =>
-        `<option value="${escHtml(k)}">${escHtml(k)} (${stats.byChapter[k]})</option>`).join('');
+      chapSel.innerHTML = '<option value="">全部章节</option>' + savedChapters.map(k =>
+        `<option value="${escHtml(k)}">${escHtml(k)} ${stats.byChapter && stats.byChapter[k] ? '(' + stats.byChapter[k] + ')' : '(历史值)'}</option>`).join('');
+
+      const savedMaps = Object.keys(stats.byMap || {}).filter(Boolean);
+      if (saved.f_map && !savedMaps.includes(saved.f_map)) savedMaps.unshift(saved.f_map);
       const mapSel = $('f_map');
-      mapSel.innerHTML = '<option value="">全部地图</option>' + Object.keys(stats.byMap || {}).filter(Boolean).map(k =>
-        `<option value="${escHtml(k)}">${escHtml(k)} (${stats.byMap[k]})</option>`).join('');
+      mapSel.innerHTML = '<option value="">全部地图</option>' + savedMaps.map(k =>
+        `<option value="${escHtml(k)}">${escHtml(k)} ${stats.byMap && stats.byMap[k] ? '(' + stats.byMap[k] + ')' : '(历史值)'}</option>`).join('');
       renderStatsGrid(stats);
     }
   });
@@ -815,6 +858,13 @@ function renderStatsGrid(stats) {
   $('draftsStatsGrid').innerHTML = cards.map(([l, v]) =>
     `<div class="stat-card"><div class="stat-val">${v}</div><div class="stat-label">${l}</div></div>`
   ).join('');
+}
+
+function clearAllDraftFilters() {
+  try { localStorage.removeItem('drf_filters'); } catch(e) {}
+  ['f_chapterId','f_map','f_answerType','f_tier','f_platform','f_status','f_sortDir','draftsSearch'].forEach(i => $(i).value = '');
+  $('f_sortBy').value = 'updatedAt';
+  refreshDrafts();
 }
 
 function resetDraftFilters() {
@@ -871,7 +921,14 @@ function loadDraftFilters() {
 
 function renderDraftsList(drafts) {
   if (drafts.length === 0) {
-    $('draftsList').innerHTML = '<div class="empty-state">匹配的草稿为空</div>';
+    $('draftsList').innerHTML = `<div class="empty-state">
+      <div style="font-size:36px;margin-bottom:10px">🔍</div>
+      匹配的草稿为空
+      <div class="empty-actions">
+        <button class="btn tiny secondary" onclick="clearAllDraftFilters()">🗑 清空筛选条件</button>
+        <button class="btn tiny" onclick="refreshDrafts()">🔄 重新加载</button>
+      </div>
+    </div>`;
     updateSelectedCount();
     return;
   }
@@ -936,6 +993,11 @@ function updateSelectedCount() {
   const n = selectedDraftIds.size;
   $('selectedCount').textContent = n + ' 条已选';
   ['batchAdoptBtn','batchArchBtn','batchDelBtn'].forEach(id => $(id).disabled = n === 0);
+  const cbtn = $('compareBtn');
+  if (cbtn) {
+    cbtn.disabled = n < 2 || n > 3;
+    cbtn.textContent = `⇆ 对比 (${n}/3)`;
+  }
 }
 
 async function rateDraft(id, rating) {
@@ -1187,6 +1249,276 @@ function renderDraftModal(d) {
   $('draftModalBody').innerHTML = html;
 }
 
+// ====== Toast 工具 ======
+function showToast(msg, type = 'ok') {
+  const t = $('toast');
+  t.textContent = msg;
+  const colors = {
+    ok: ['#20a050', '#70c090'],
+    warn: ['#c08030', '#d09050'],
+    error: ['#c03040', '#c07070'],
+  };
+  const [bc, fc] = colors[type] || colors.ok;
+  t.style.borderColor = bc;
+  t.style.color = fc;
+  t.style.display = 'block';
+  clearTimeout(window._toastT);
+  window._toastT = setTimeout(() => { t.style.display = 'none'; }, 2500);
+}
+
+// ====== 导出评审文本 ======
+let lastRenderedDraft = null;
+function buildReviewText(d) {
+  const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
+  const tierLabels = { easy: '轻松', standard: '标准', hard: '硬核', nightmare: '噩梦' };
+  const statusLabels = { draft: '草稿', adopted: '已采用', archived: '已归档' };
+  const platformLabels = { pc: 'PC', console: '主机', mobile: '移动端' };
+  const catLabels = { person: '人物', place: '地点', event: '事件', thing: '物品', generic: '通用' };
+
+  const lines = [];
+  lines.push('=== 阴间电台谜题 · 策划评审单 ===');
+  lines.push('草稿 ID: ' + (d.draftId || '').slice(0, 10));
+  lines.push('章节: ' + (d.chapterId || '-'));
+  lines.push('地图: ' + (d.currentMap || '-'));
+  lines.push('谜底类型: ' + (typeLabels[d.answerType] || d.answerType || '-'));
+  lines.push('难度档: ' + (tierLabels[d.difficultyTier] || d.difficultyTier || '-'));
+  lines.push('平台: ' + (platformLabels[d.platform] || d.platform));
+  lines.push('状态: ' + (statusLabels[d.status] || d.status));
+  if (d.qualityRating) lines.push('质量评分: ' + '★'.repeat(d.qualityRating) + '☆'.repeat(5 - d.qualityRating));
+  lines.push('创建: ' + (d.createdAt || '-'));
+  lines.push('更新: ' + (d.updatedAt || '-'));
+  lines.push('');
+  lines.push('--- 谜底 ---');
+  lines.push((typeLabels[d.answerType] || d.answerType) + ': ' + (d.answerDisplay || d.answer?.value || '-'));
+  if (d.answerLength) lines.push('谜底长度: ' + d.answerLength);
+  lines.push('');
+  lines.push('--- 电台广播 ---');
+  lines.push(d.broadcast?.text || '(无)');
+  lines.push('');
+  lines.push('--- 线索列表 ---');
+  (d.clues || []).forEach((c, i) => {
+    lines.push(`  ${i + 1}. [${c.type}] ${c.text || ''}`);
+  });
+  lines.push('');
+  const adj = d.platformAdjustments || [];
+  lines.push('--- 平台调整 (' + adj.length + ' 项) ---');
+  if (adj.length) {
+    adj.forEach(a => {
+      lines.push(`  · ${a.field}: ${a.from} → ${a.to} (${a.reason})`);
+    });
+  } else {
+    lines.push('  ✓ 全部约束符合当前平台');
+  }
+  lines.push('');
+  const sf = d.spoilerFilter;
+  const fr = sf?.fullReport;
+  lines.push('--- 剧透过滤报告 ---');
+  if (sf?.applied && fr) {
+    lines.push(`  禁用词总数: ${fr.totalForbidden} / 命中: ${fr.totalHit} / 未命中: ${fr.totalMissed} / 替换处: ${fr.totalReplacements}`);
+    if (fr.bySource && Object.keys(fr.bySource).length) {
+      lines.push('  按位置分布: ' + Object.entries(fr.bySource).map(([s, info]) =>
+        `${s} ${info.totalScanned || info.hit?.length || 0}处`).join(' | '));
+    }
+    if (fr.hit?.length) {
+      lines.push('  已命中过滤:');
+      fr.hit.forEach(h => {
+        lines.push(`    · [${catLabels[h.category] || h.category}] "${h.original}" → "${h.replacement}"  ×${h.occurrences || 1}`);
+        if (h.sources?.length) lines.push(`      出现于: ${h.sources.join(', ')}`);
+        if (h.matchedSynonyms?.length) lines.push(`      匹配方式: ${h.matchedSynonyms.join(', ')}`);
+      });
+    }
+    if (fr.missed?.length) {
+      lines.push('  未命中（本次未出现）:');
+      fr.missed.forEach(m => lines.push(`    ⚠ ${m}`));
+    }
+  } else if (sf?.applied) {
+    lines.push('  启用过滤，但本次无命中');
+  } else {
+    lines.push('  未启用过滤（未提供禁用词）');
+  }
+  lines.push('');
+  lines.push('--- 评审信息 ---');
+  if (d.tags?.length) lines.push('标签: ' + d.tags.join(', '));
+  if (d.notes) lines.push('备注: ' + d.notes);
+  if (d.forbiddenInfo?.length) lines.push('禁用词清单: ' + d.forbiddenInfo.join(', '));
+  lines.push('');
+  lines.push('=== 评审结束 ' + new Date().toLocaleString('zh-CN', { hour12: false }) + ' ===');
+  return lines.join('\n');
+}
+
+async function copyReviewText() {
+  if (!lastRenderedDraft) { showToast('无可复制的草稿', 'warn'); return; }
+  const text = buildReviewText(lastRenderedDraft);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    showToast('✅ 已复制评审文本到剪贴板');
+  } catch (e) {
+    showToast('复制失败: ' + e.message, 'error');
+  }
+}
+
+// ====== 对比复核模式 ======
+let compareDecisions = {};  // draftId -> 'adopt' | 'archive' | null
+let loadedCompareDrafts = [];
+
+async function openCompareModal() {
+  if (selectedDraftIds.size < 2 || selectedDraftIds.size > 3) {
+    showToast('请选择 2-3 条进行对比', 'warn'); return;
+  }
+  compareDecisions = {};
+  loadedCompareDrafts = [];
+  for (const id of selectedDraftIds) {
+    const { ok, data } = await apiCall('GET', '/drafts/' + id);
+    if (ok) { loadedCompareDrafts.push(data); compareDecisions[id] = null; }
+  }
+  renderCompareModal();
+  $('compareModal').style.display = 'block';
+}
+
+function closeCompareModal() { $('compareModal').style.display = 'none'; }
+
+function toggleCompareDecision(draftId, kind) {
+  if (compareDecisions[draftId] === kind) compareDecisions[draftId] = null;
+  else compareDecisions[draftId] = kind;
+  renderCompareModal();
+}
+
+async function applyCompareDecisions() {
+  const toAdopt = Object.entries(compareDecisions).filter(([_, v]) => v === 'adopt').map(([k]) => k);
+  const toArchive = Object.entries(compareDecisions).filter(([_, v]) => v === 'archive').map(([k]) => k);
+  let ok = true;
+  if (toAdopt.length) {
+    const r = await apiCall('PATCH', '/drafts/batch/status', { draftIds: toAdopt, status: 'adopted' });
+    if (!r.ok) ok = false;
+  }
+  if (toArchive.length) {
+    const r = await apiCall('PATCH', '/drafts/batch/status', { draftIds: toArchive, status: 'archived' });
+    if (!r.ok) ok = false;
+  }
+  if (ok) {
+    const total = toAdopt.length + toArchive.length;
+    showToast(`✅ 已应用决策: 采用${toAdopt.length}条, 归档${toArchive.length}条`);
+    selectedDraftIds.clear();
+    closeCompareModal();
+    refreshDrafts();
+  } else {
+    showToast('部分操作失败', 'error');
+  }
+}
+
+function renderCompareModal() {
+  const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
+  const tierLabels = { easy: '轻松', standard: '标准', hard: '硬核', nightmare: '噩梦' };
+  const catLabels = { person: '人物', place: '地点', event: '事件', thing: '物品', generic: '通用' };
+
+  let html = '';
+  const counts = Object.values(compareDecisions).reduce((a, c) => {
+    a[c || 'none'] = (a[c || 'none'] || 0) + 1; return a;
+  }, {});
+  html += `<div style="font-size:11px;color:#8a8a9e;margin-bottom:10px;padding:6px 10px;background:#12121e;border-radius:2px">
+    当前决策: 采用 <span style="color:#70c090">${counts.adopt || 0}</span> 条 · 归档 <span style="color:#d09050">${counts.archive || 0}</span> 条 · 待定 <span style="color:#6a6a7e">${counts.none || 0}</span> 条
+  </div>`;
+
+  html += '<div class="compare-grid">';
+  loadedCompareDrafts.forEach(d => {
+    const dec = compareDecisions[d.draftId] || null;
+    const colCls = dec === 'adopt' ? 'selected' : (dec === 'archive' ? 'rejected' : '');
+    html += `<div class="compare-col ${colCls}">
+      <div class="compare-header">
+        <div class="compare-title">
+          <span class="tier-tag tier-${d.difficultyTier}">${escHtml(tierLabels[d.difficultyTier] || '-')}</span>
+          ${escHtml(d.currentMap || '-')} · ${escHtml(typeLabels[d.answerType] || '-')}
+        </div>
+        <div>
+          <button class="decision-btn ${dec === 'adopt' ? 'active-adopt' : ''}" onclick="toggleCompareDecision('${d.draftId}','adopt')">✓ 采用</button>
+          <button class="decision-btn ${dec === 'archive' ? 'active-archive' : ''}" onclick="toggleCompareDecision('${d.draftId}','archive')">▣ 归档</button>
+        </div>
+      </div>
+      <div style="font-size:10px;color:#5a5a6e;margin-bottom:6px">
+        平台: ${escHtml(d.platform || '-')} · 长度: ${d.answerLength || 0} · 更新: ${new Date(d.updatedAt).toLocaleString('zh-CN', { hour12: false })}
+        ${d.hasSpoilerFilter || d.spoilerFilter?.applied ? `<span class="badge hot" style="margin-left:6px">禁${d.spoilerReplacements || d.spoilerFilter?.fullReport?.totalReplacements || 0}</span>` : ''}
+        ${d.platformAdjustments?.length || d.platformAdjustmentsCount ? `<span class="badge warn" style="margin-left:4px">调${d.platformAdjustments?.length || d.platformAdjustmentsCount || 0}</span>` : ''}
+        ${d.qualityRating ? '<span style="margin-left:4px">★' + d.qualityRating + '</span>' : ''}
+      </div>
+      <div class="review-section"><div class="review-title">🎯 谜底</div>
+        <div class="answer-box" style="font-size:12px;padding:6px 10px">${escHtml(d.answerDisplay || d.answer?.value || '')}</div></div>
+      <div class="review-section"><div class="review-title">📡 广播</div>
+        <div style="white-space:pre-wrap;line-height:1.7;font-size:11px;color:#8ab4f8;background:#0a0a0f;padding:8px;border-left:2px solid #4a9eff">${escHtml(d.broadcast?.text || '')}</div></div>
+      <div class="review-section"><div class="review-title">🔍 线索 (${(d.clues || []).length})</div>
+        ${(d.clues || []).map(c => `<div style="padding:4px 8px;margin:3px 0;font-size:10px;background:#12121e;border-left:2px solid #2a2a3e">
+          <span class="clue-${c.type || 'environmental'}" style="font-size:9px;letter-spacing:1px;text-transform:uppercase">[${c.type || ''}]</span>
+          ${escHtml((c.text || '').substring(0, 80))}${(c.text || '').length > 80 ? '...' : ''}
+        </div>`).join('')}
+      </div>`;
+
+    const sf = d.spoilerFilter;
+    const fr = sf?.fullReport;
+    if (sf?.applied && fr) {
+      html += `<div class="review-section"><div class="review-title">🚫 过滤 (命${fr.totalHit}/${fr.totalForbidden})</div>`;
+      if (fr.hit?.length) {
+        fr.hit.slice(0, 5).forEach(h => {
+          html += `<div style="font-size:10px;padding:3px 6px;margin:2px 0;background:#1a0f15;border-left:2px solid #c05080">
+            <span style="color:#e070a0;text-decoration:line-through">${escHtml(h.original)}</span> →
+            <span style="color:#70c0a0">${escHtml(h.replacement)}</span>
+            <span style="float:right;color:#6a6a7e">×${h.occurrences || 1}</span>
+          </div>`;
+        });
+        if (fr.hit.length > 5) html += `<div style="font-size:9px;color:#6a6a7e;margin-top:2px">…还有${fr.hit.length - 5}条</div>`;
+      } else {
+        html += `<div style="font-size:10px;color:#80a070">无替换（所有禁用词未命中）</div>`;
+      }
+      if (fr.missed?.length) {
+        html += `<div style="font-size:9px;color:#d09050;margin-top:3px">未命中 ${fr.missed.length} 条</div>`;
+      }
+      html += '</div>';
+    }
+
+    const adj = d.platformAdjustments || [];
+    if (adj.length) {
+      html += `<div class="review-section"><div class="review-title">⚙ 平台调整 (${adj.length})</div>`;
+      adj.slice(0, 5).forEach(a => {
+        html += `<div style="font-size:10px;padding:3px 6px;margin:2px 0;background:#0f141a;border-left:2px solid #4a9eff">
+          <strong>${escHtml(a.field)}</strong>: <span style="text-decoration:line-through;opacity:.5">${escHtml(String(a.from))}</span> →
+          <span style="color:#70c090">${escHtml(String(a.to))}</span>
+          <span style="float:right;color:#6a6a7e">${escHtml(a.reason || '')}</span>
+        </div>`;
+      });
+      if (adj.length > 5) html += `<div style="font-size:9px;color:#6a6a7e">…还有${adj.length - 5}项</div>`;
+      html += '</div>';
+    }
+
+    html += `<div style="margin-top:6px;display:flex;gap:4px;justify-content:flex-end">
+        <button class="decision-btn" onclick="event.stopPropagation();useDraftAsResult('${d.draftId}');closeCompareModal()">📥 载入</button>
+        <button class="decision-btn" onclick="event.stopPropagation();lastRenderedDraft=findCompare('${d.draftId}');copyReviewText()">📋 评审单</button>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+  $('compareBody').innerHTML = html;
+}
+
+function findCompare(id) { return loadedCompareDrafts.find(x => x.draftId === id); }
+
+// 把 openDraftModal 的 lastRenderedDraft 同步
+const _origOpenDraftModal = openDraftModal;
+openDraftModal = async function (id) {
+  const { ok, data } = await apiCall('GET', '/drafts/' + id);
+  if (!ok) return;
+  lastRenderedDraft = data;
+  currentDraftId = id;
+  renderDraftModal(data);
+  $('draftModal').style.display = 'block';
+};
+
 // ====== 会话时间线 ======
 async function refreshTimeline() {
   const sid = $('timelineSessionId').value.trim() || currentSessionId;
@@ -1220,51 +1552,117 @@ function renderTimeline(events, sid) {
     session_reset: ['重置会话', 'reset'],
   };
 
-  const html = events.map(ev => {
+  // 一致性检查（相邻事件的失败次数变化）
+  const consistencyIssues = [];
+  for (let i = 1; i < events.length; i++) {
+    const prev = events[i - 1], cur = events[i];
+    const prevFC = prev.failureCount ?? prev.afterFailure ?? prev.failureCountAtGen ?? null;
+    const curFC = cur.failureCount ?? cur.afterFailure ?? cur.failureCountAtGen ?? null;
+    if (prevFC != null && curFC != null) {
+      // 允许的变化：reset→0, failure→+1, attempt失败→+1, 其他相等
+      if (cur.type === 'session_reset') {
+        if (curFC !== 0) consistencyIssues.push({ at: i, msg: '重置后失败次数应为 0，实际是 ' + curFC });
+      } else if (cur.type === 'failure_reported' || (cur.type === 'attempt_recorded' && !cur.correct)) {
+        const delta = (cur.deltaFailure ?? cur.delta ?? 1);
+        if (curFC !== prevFC + delta && curFC !== prevFC + 1) {
+          consistencyIssues.push({ at: i, msg: `${cur.type} 失败次数变化异常: 期望 ${prevFC}+${delta || 1} → ${prevFC + (delta || 1)}, 实际 ${prevFC} → ${curFC}` });
+        }
+      } else if (cur.type === 'puzzle_generated') {
+        if (curFC !== prevFC) consistencyIssues.push({ at: i, msg: `生成谜题未继承上一状态的失败次数: 上一${prevFC}, 现在${curFC}` });
+      }
+    }
+  }
+
+  const html = events.map((ev, idx) => {
     const [label, cls] = typeLabels[ev.type] || [ev.type, ''];
     let detail = '';
     let preview = '';
+    let fcBadge = '';
+    let levelBadge = '';
+    const issue = consistencyIssues.find(x => x.at === idx);
+    const prevFC = idx > 0 ? (events[idx - 1].failureCount ?? events[idx - 1].afterFailure ?? events[idx - 1].failureCountAtGen ?? null) : null;
+    const curFC = ev.failureCount ?? ev.afterFailure ?? ev.failureCountAtGen ?? null;
 
     if (ev.type === 'puzzle_generated') {
-      detail = `第 #${(ev.puzzleIndex ?? 0) + 1} 个谜题 · ${ev.answerType || ''}
-失败次数: ${ev.failureCountAtGen} · 适配 Lv${ev.adaptationLevel ?? 0} · ${ev.platform || ''}`;
-      if (ev.broadcastSnapshot) {
-        preview = (ev.broadcastSnapshot.text || '').slice(0, 100);
-      }
+      detail = `第 #${(ev.puzzleIndex ?? 0) + 1} 个谜题 · ${ev.answerType || ''} · ${ev.platform || ''}`;
+      fcBadge = `<span class="fc-badge">失败 ${ev.failureCountAtGen ?? 0}</span>`;
+      levelBadge = `<span class="level-badge">适配 Lv${ev.adaptationLevel ?? 0} ${escHtml(ev.adaptationName || '')}</span>`;
+      if (ev.broadcastSnapshot) preview = (ev.broadcastSnapshot.text || '').slice(0, 100);
     } else if (ev.type === 'replay_requested') {
-      detail = `谜题 #${(ev.puzzleIndex ?? 0) + 1} · 适配 Lv${ev.adaptationLevel ?? 0}
-失败次数: ${ev.failureCount ?? 0}`;
+      detail = `谜题 #${(ev.puzzleIndex ?? 0) + 1}`;
+      fcBadge = `<span class="fc-badge">失败 ${ev.failureCount ?? 0}</span>`;
+      levelBadge = `<span class="level-badge">适配 Lv${ev.adaptationLevel ?? 0}</span>`;
       if (ev.replayBroadcast) preview = (ev.replayBroadcast.text || '').slice(0, 100);
     } else if (ev.type === 'attempt_recorded') {
-      detail = `谜题 #${(ev.puzzleIndex ?? 0) + 1} · ${ev.correct ? '✅ 正确' : '❌ 错误'}
+      detail = `谜题 #${(ev.puzzleIndex ?? 0) + 1} · ${ev.correct ? '<span style="color:#70c090">✅ 正确</span>' : '<span style="color:#e07070">❌ 错误</span>'}
 答案: ${JSON.stringify(ev.answer)}`;
-      if (ev.deltaFailure) {
-        detail += `<span class="fc-delta fc-up">失败 +${ev.deltaFailure}</span>`;
+      if (!ev.correct) {
+        fcBadge = `<span class="fc-badge">失败 ${ev.afterFailure ?? 0}</span>`;
+        if (ev.deltaFailure) detail += `<span class="fc-delta fc-up">+${ev.deltaFailure}</span>`;
+      } else {
+        fcBadge = `<span class="fc-badge" style="color:#70c090;border-color:#205030;background:#0a1a0e">成功 (${ev.afterFailure ?? 0})</span>`;
       }
     } else if (ev.type === 'failure_reported') {
-      detail = `失败 ${ev.beforeFailure} → ${ev.afterFailure}
+      detail = `<span style="color:#e07070">失败</span>: ${ev.beforeFailure} → ${ev.afterFailure}
 <span class="fc-delta fc-up">+${ev.delta || 1}</span>
 原因: ${ev.reason || 'manual'}`;
+      fcBadge = `<span class="fc-badge" style="color:#e0a0a0;border-color:#503030;background:#1a0a0a">失败 ${ev.afterFailure}</span>`;
     } else if (ev.type === 'player_state_updated') {
       detail = `失败次数 ${ev.beforeFailure} → ${ev.afterFailure}`;
+      fcBadge = `<span class="fc-badge">失败 ${ev.afterFailure}</span>`;
     } else if (ev.type === 'session_created') {
       detail = `章节: ${ev.chapterId || '-'}`;
+      fcBadge = `<span class="fc-badge" style="color:#70c090;border-color:#205030;background:#0a1a0e">失败 0</span>`;
     } else if (ev.type === 'session_reset') {
-      detail = `重置失败次数 ${ev.beforeFailure} → ${ev.afterFailure}`;
+      detail = `重置失败次数: ${ev.beforeFailure} → ${ev.afterFailure || 0}`;
+      fcBadge = `<span class="fc-badge" style="color:#70c090;border-color:#205030;background:#0a1a0e">失败 ${ev.afterFailure || 0}</span>`;
     }
 
     return `<div class="tl-item ${cls} ${currentTimelineId === ev.id ? 'active' : ''}" onclick="showTimelineEvent('${ev.id}', this)">
+      ${issue ? `<div class="consistency-warn" style="margin:0 0 6px 0">⚠ ${escHtml(issue.msg)}</div>` : ''}
       <div>
         <span class="tl-type">${label}</span>
         <span class="tl-time">${new Date(ev.timestamp).toLocaleTimeString('zh-CN', { hour12: false })}</span>
       </div>
-      <div class="tl-detail">${detail}</div>
+      <div class="event-card-meta">
+        ${fcBadge}
+        ${levelBadge}
+        ${prevFC != null && curFC != null && curFC !== prevFC ? `<span class="fc-delta ${curFC > prevFC ? 'fc-up' : 'fc-down'}">${curFC > prevFC ? '+' : ''}${curFC - prevFC}</span>` : ''}
+      </div>
+      <div class="tl-detail" style="margin-top:6px">${detail}</div>
       ${preview ? `<div class="tl-preview">📻 ${escHtml(preview)}…</div>` : ''}
     </div>`;
   }).join('');
 
   $('timelineList').innerHTML = html;
+
+  // 顶部一致性汇总
+  const topWarn = $('timelineStats');
+  const origTxt = topWarn.getAttribute('data-basetext') || topWarn.textContent;
+  if (consistencyIssues.length > 0) {
+    topWarn.innerHTML = (topWarn.getAttribute('data-basetext') || topWarn.textContent) +
+      ` · <span style="color:#c07070">⚠ ${consistencyIssues.length} 处一致性警告</span>`;
+  }
 }
+
+// 保存基础文本
+const _origRefresh = refreshTimeline;
+refreshTimeline = async function () {
+  const sid = $('timelineSessionId').value.trim() || currentSessionId;
+  if (!sid) { updateStatus('请先填写或创建会话ID'); return; }
+  $('timelineSessionId').value = sid;
+  const { ok, data } = await apiCall('GET', '/session/' + sid + '/timeline');
+  if (!ok) return;
+  const info = (await apiCall('GET', '/session/' + sid));
+  let baseTxt = '';
+  if (info.ok) {
+    baseTxt = `会话 ${sid.slice(0, 8)}… · 当前失败 ${info.data.playerState?.failureCount || 0} · ${info.data.puzzles?.length || 0} 个谜题 · ${data.timeline.length} 条事件`;
+  }
+  const warnEl = $('timelineStats');
+  warnEl.setAttribute('data-basetext', baseTxt);
+  warnEl.textContent = baseTxt;
+  renderTimeline(data.timeline || [], data.sessionId);
+};
 
 async function showTimelineEvent(eventId, el) {
   currentTimelineId = eventId;
@@ -1287,11 +1685,33 @@ function renderTimelineEventDetail(ev) {
     session_reset: '重置会话',
   };
 
+  const fc = ev.failureCount ?? ev.afterFailure ?? ev.failureCountAtGen ?? null;
+
   let html = `<div class="result-box"><div class="tag">${escHtml(ev.id.slice(0, 8))}</div>
     <div style="font-size:12px;margin-bottom:8px">
       <strong>${escHtml(typeLabels[ev.type] || ev.type)}</strong><br>
       <span style="color:#5a5a6e;font-size:10px">${escHtml(ev.timestamp)}</span>
     </div>`;
+
+  if (fc != null) {
+    const level = Math.min(3, Math.floor(fc / 2));
+    const levelLabels = ['原始 (Lv0)', '微光 (Lv1)', '回声 (Lv2)', '余烬 (Lv3)'];
+    html += `<div class="review-section"><div class="review-title">📊 失败次数 & 适配等级</div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <div class="stat-card" style="flex:1"><div class="stat-val">${fc}</div><div class="stat-label">失败次数</div></div>
+        <div class="stat-card" style="flex:1"><div class="stat-val" style="color:#c090e0">Lv${level}</div><div class="stat-label">适配等级</div></div>
+        <div class="stat-card" style="flex:2"><div class="stat-val" style="font-size:12px;color:#8ab4f8">${levelLabels[level]}</div><div class="stat-label">下次重播</div></div>
+      </div>`;
+
+    // 失败次数和适配等级一致性
+    const snapLevel = ev.broadcastSnapshot?.adaptationLevel ?? ev.replayBroadcast?.adaptationLevel ?? ev.adaptationLevel;
+    if (snapLevel != null && snapLevel !== level) {
+      html += `<div class="consistency-warn">⚠ 适配等级不一致: 快照记录 Lv${snapLevel}，按失败次数推算 Lv${level}</div>`;
+    } else if (snapLevel != null) {
+      html += `<div style="margin-top:6px;font-size:10px;color:#70c090">✓ 适配等级一致 (快照 Lv${snapLevel} = 推算 Lv${level})</div>`;
+    }
+    html += '</div>';
+  }
 
   const snap = ev.broadcastSnapshot || ev.replayBroadcast;
   if (snap) {
@@ -1318,6 +1738,14 @@ function renderTimelineEventDetail(ev) {
         失败次数变化: ${ev.beforeFailure} → ${ev.afterFailure}
         ${ev.deltaFailure ? `<span class="fc-delta fc-up">+${ev.deltaFailure}</span>` : ''}
       </div></div>`;
+
+    // 验证答案后失败次数一致性
+    if (ev.beforeFailure != null && ev.afterFailure != null) {
+      const expectedAfter = ev.correct ? ev.beforeFailure : ev.beforeFailure + (ev.deltaFailure || 1);
+      if (ev.afterFailure !== expectedAfter) {
+        html += `<div class="consistency-warn">⚠ 失败次数异常: ${ev.correct ? '正确' : '错误'} 应该 ${expectedAfter}, 实际 ${ev.afterFailure}</div>`;
+      }
+    }
   }
 
   if (ev.type === 'failure_reported') {

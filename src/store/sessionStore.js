@@ -108,13 +108,17 @@ function addPuzzleToSession(sessionId, puzzleId, puzzleData, snapshot = null) {
   if (!session) return null;
 
   const index = session.puzzles.length;
+  const pAdapt = puzzleData.adaptation || {};
+  const adaptLevel = pAdapt.level ?? pAdapt.adaptationLevel ?? (puzzleData.adaptationLevel) ?? 0;
+  const adaptName = pAdapt.name ?? pAdapt.label ?? pAdapt.adaptationLabel ?? '';
+
   const record = {
     puzzleId,
     answerType: puzzleData.answer?.type,
     answerValue: puzzleData.answer?.value,
     currentMap: puzzleData.currentMap,
     platform: puzzleData.platform,
-    adaptationLevel: puzzleData.adaptation?.level,
+    adaptationLevel: adaptLevel,
     attempts: [],
     solved: false,
     createdAt: new Date().toISOString(),
@@ -130,12 +134,13 @@ function addPuzzleToSession(sessionId, puzzleId, puzzleData, snapshot = null) {
     currentMap: record.currentMap,
     platform: record.platform,
     failureCountAtGen: session.playerState.failureCount,
-    adaptationLevel: record.adaptationLevel,
+    adaptationLevel: adaptLevel,
+    adaptationName: adaptName,
     broadcastSnapshot: snapshot ? {
       text: snapshot.broadcast?.text,
-      clues: snapshot.clues?.map(c => ({ id: c.id, type: c.type, text: c.text })),
-      adaptationLevel: snapshot.adaptation?.level,
-      adaptationName: snapshot.adaptation?.name,
+      clues: (snapshot.clues || []).map(c => ({ id: c.id, type: c.type, text: c.text })),
+      adaptationLevel: adaptLevel,
+      adaptationName: adaptName,
     } : null,
   }));
 
