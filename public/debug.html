@@ -11,26 +11,28 @@ body{background:#0a0a0f;color:#c8c8d0;font-family:'Courier New',monospace;min-he
 .header h1{font-size:22px;color:#e8475f;letter-spacing:4px}
 .header p{font-size:12px;color:#6a6a7e;margin-top:4px;letter-spacing:1px}
 .container{display:flex;min-height:calc(100vh - 80px)}
-.left{width:420px;border-right:1px solid #2a2a3e;padding:20px;overflow-y:auto;background:#0e0e18}
-.right{flex:1;padding:20px;overflow-y:auto;background:#0a0a0f}
-.section{margin-bottom:20px}
-.section-title{font-size:11px;color:#e8475f;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:4px;border-bottom:1px solid #1a1a2e}
-label{display:block;font-size:11px;color:#8a8a9e;margin-bottom:3px;margin-top:8px}
+.left{width:420px;border-right:1px solid #2a2a3e;padding:16px;overflow-y:auto;background:#0e0e18}
+.right{flex:1;padding:16px;overflow-y:auto;background:#0a0a0f}
+.section{margin-bottom:18px}
+.section-title{font-size:11px;color:#e8475f;letter-spacing:2px;text-transform:uppercase;margin-bottom:10px;padding-bottom:4px;border-bottom:1px solid #1a1a2e;display:flex;justify-content:space-between;align-items:center}
+.section-title .toggle{font-size:10px;color:#4a4a5e;cursor:pointer;border:1px solid #2a2a3e;padding:2px 6px}
+label{display:block;font-size:11px;color:#8a8a9e;margin-bottom:3px;margin-top:7px}
 input[type="text"],input[type="number"],select,textarea{width:100%;background:#12121e;border:1px solid #2a2a3e;color:#c8c8d0;padding:6px 10px;font-family:'Courier New',monospace;font-size:12px;border-radius:2px}
-textarea{resize:vertical;min-height:50px}
+textarea{resize:vertical;min-height:48px}
 select{cursor:pointer}
-.btn{display:inline-block;padding:8px 18px;font-family:'Courier New',monospace;font-size:12px;cursor:pointer;border:1px solid #e8475f;color:#e8475f;background:transparent;letter-spacing:1px;transition:all .2s;margin-top:12px;margin-right:8px}
+.btn{display:inline-block;padding:6px 14px;font-family:'Courier New',monospace;font-size:11px;cursor:pointer;border:1px solid #e8475f;color:#e8475f;background:transparent;letter-spacing:1px;transition:all .2s;margin-top:10px;margin-right:6px;border-radius:2px}
 .btn:hover{background:#e8475f;color:#0a0a0f}
 .btn.secondary{border-color:#4a4a5e;color:#4a4a5e}
 .btn.secondary:hover{background:#4a4a5e;color:#0a0a0f}
-.radio-group{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
-.radio-group label{display:inline-flex;align-items:center;gap:4px;margin:0;cursor:pointer;font-size:11px;padding:4px 8px;border:1px solid #2a2a3e;border-radius:2px}
-.radio-group input[type="radio"]{width:auto;margin:0}
-.radio-group label:has(input:checked){border-color:#e8475f;color:#e8475f}
-.result-box{background:#0e0e18;border:1px solid #2a2a3e;padding:16px;margin-bottom:16px;border-radius:2px;position:relative}
-.result-box .tag{position:absolute;top:8px;right:8px;font-size:9px;padding:2px 6px;border:1px solid #2a2a3e;color:#6a6a7e;letter-spacing:1px}
+.btn.small{padding:4px 10px;font-size:10px;margin-top:4px}
+.radio-group{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px}
+.radio-group label{display:inline-flex;align-items:center;gap:4px;margin:0;cursor:pointer;font-size:11px;padding:3px 7px;border:1px solid #2a2a3e;border-radius:2px;color:#8a8a9e}
+.radio-group input[type="radio"]{width:auto;margin:0;accent-color:#e8475f}
+.radio-group label:has(input:checked){border-color:#e8475f;color:#e8475f;background:#1a0a0e}
+.result-box{background:#0e0e18;border:1px solid #2a2a3e;padding:14px;margin-bottom:14px;border-radius:2px;position:relative}
+.result-box .tag{position:absolute;top:8px;right:10px;font-size:9px;padding:2px 6px;border:1px solid #2a2a3e;color:#6a6a7e;letter-spacing:1px;background:#0a0a0f}
 .broadcast-text{white-space:pre-wrap;line-height:1.8;color:#8ab4f8;font-size:13px;letter-spacing:0.5px}
-.clue-item{padding:8px 12px;margin:6px 0;border-left:2px solid #2a2a3e;background:#12121e;font-size:12px}
+.clue-item{padding:7px 11px;margin:5px 0;border-left:2px solid #2a2a3e;background:#12121e;font-size:12px}
 .clue-item.direct{border-left-color:#e8475f}
 .clue-item.indirect{border-left-color:#f0a030}
 .clue-item.environmental{border-left-color:#4a9eff}
@@ -38,29 +40,56 @@ select{cursor:pointer}
 .clue-direct{color:#e8475f}
 .clue-indirect{color:#f0a030}
 .clue-environmental{color:#4a9eff}
-.feedback-item{padding:6px 12px;margin:4px 0;background:#1a0a0a;border-left:2px solid #5a2020;font-size:12px;color:#c07070}
-.hook-text{padding:10px 12px;background:#0a1a0a;border-left:2px solid #20a050;font-size:12px;color:#70c090;line-height:1.6}
-.answer-box{background:#1a0a1a;border:1px solid #3a1a3a;padding:10px 14px;font-size:14px;color:#e060c0;letter-spacing:1px}
-.difficulty-info{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
-.diff-tag{font-size:10px;padding:3px 8px;border:1px solid #2a2a3e;color:#8a8a9e}
-.status-bar{position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;border-top:1px solid #2a2a3e;padding:6px 20px;font-size:10px;color:#4a4a5e;display:flex;justify-content:space-between}
+.feedback-item{padding:5px 11px;margin:4px 0;background:#1a0a0a;border-left:2px solid #5a2020;font-size:12px;color:#c07070}
+.hook-text{padding:9px 12px;background:#0a1a0a;border-left:2px solid #20a050;font-size:12px;color:#70c090;line-height:1.6}
+.answer-box{background:#1a0a1a;border:1px solid #3a1a3a;padding:9px 13px;font-size:13px;color:#e060c0;letter-spacing:1px}
+.difficulty-info{display:flex;flex-wrap:wrap;gap:6px;margin:7px 0}
+.diff-tag{font-size:10px;padding:2px 7px;border:1px solid #2a2a3e;color:#8a8a9e;border-radius:2px}
+.diff-tag.warn{border-color:#5a3a1a;color:#d09050}
+.status-bar{position:fixed;bottom:0;left:0;right:0;background:#1a1a2e;border-top:1px solid #2a2a3e;padding:5px 20px;font-size:10px;color:#4a4a5e;display:flex;justify-content:space-between;z-index:10}
 .session-info{font-size:10px;color:#4a9eff;margin-top:4px}
-.warning-box{background:#1a1a0a;border:1px solid #3a3a1a;padding:8px 12px;font-size:11px;color:#c0c070;margin:6px 0}
-.raw-json{background:#0e0e18;border:1px solid #2a2a3e;padding:10px;font-size:10px;color:#6a6a7e;white-space:pre-wrap;max-height:300px;overflow-y:auto;margin-top:8px}
-.tabs{display:flex;gap:0;margin-bottom:16px;border-bottom:1px solid #2a2a3e}
-.tab{padding:8px 16px;font-size:11px;cursor:pointer;border-bottom:2px solid transparent;color:#6a6a7e;font-family:'Courier New',monospace;background:transparent;border-top:none;border-left:none;border-right:none;letter-spacing:1px}
+.warning-box{background:#1a1a0a;border:1px solid #3a3a1a;padding:7px 11px;font-size:11px;color:#c0c070;margin:5px 0;border-radius:2px}
+.adjustment-item{padding:4px 10px;margin:3px 0;background:#0f141a;border-left:2px solid #4a9eff;font-size:11px;color:#7ab0e0}
+.adjustment-item .from{text-decoration:line-through;opacity:.5}
+.adjustment-item .to{color:#70c090;font-weight:bold}
+.spoiler-item{padding:5px 10px;margin:4px 0;background:#1a0f15;border-left:2px solid #c05080;font-size:11px}
+.spoiler-original{color:#e070a0;text-decoration:line-through;opacity:.7}
+.spoiler-replacement{color:#70c0a0;margin-left:6px}
+.spoiler-count{float:right;font-size:10px;color:#6a6a7e}
+.tabs{display:flex;gap:0;margin-bottom:14px;border-bottom:1px solid #2a2a3e;flex-wrap:wrap}
+.tab{padding:6px 14px;font-size:11px;cursor:pointer;border-bottom:2px solid transparent;color:#6a6a7e;font-family:'Courier New',monospace;background:transparent;border-top:none;border-left:none;border-right:none;letter-spacing:1px}
 .tab.active{color:#e8475f;border-bottom-color:#e8475f}
 .tab-content{display:none}
 .tab-content.active{display:block}
-.checkbox-row{display:flex;align-items:center;gap:6px;margin-top:8px}
-.checkbox-row input[type="checkbox"]{width:auto}
-.checkbox-row label{margin:0;font-size:11px;cursor:pointer}
+.checkbox-row{display:flex;align-items:center;gap:6px;margin-top:7px}
+.checkbox-row input[type="checkbox"]{width:auto;accent-color:#e8475f}
+.checkbox-row label{margin:0;font-size:11px;cursor:pointer;color:#8a8a9e}
+.draft-item{padding:9px 12px;margin:6px 0;background:#12121e;border:1px solid #2a2a3e;border-left:3px solid #4a4a5e;cursor:pointer;border-radius:2px;transition:all .15s}
+.draft-item:hover{border-color:#e8475f;border-left-color:#e8475f;background:#1a1218}
+.draft-item.draft{border-left-color:#4a4a5e}
+.draft-item.adopted{border-left-color:#20a050}
+.draft-item.archived{border-left-color:#5a5a6e;opacity:.6}
+.draft-title{font-size:12px;color:#c8c8d0;margin-bottom:3px}
+.draft-meta{font-size:10px;color:#6a6a7e;display:flex;gap:8px;flex-wrap:wrap}
+.draft-meta .status{padding:1px 5px;border:1px solid #2a2a3e;border-radius:2px}
+.filter-row{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.filter-row select,.filter-row input{flex:1;min-width:80px;padding:4px 8px;font-size:11px}
+.empty-state{padding:30px;text-align:center;color:#4a4a5e;font-size:12px;letter-spacing:1px}
+.spoiler-highlight{background:#2a1a1f;color:#e080a0;padding:0 3px;border-radius:2px}
+.spoiler-highlight::after{content:"⚠";font-size:9px;margin-left:2px;vertical-align:super}
+.sub-tabs{display:flex;gap:0;margin-bottom:10px;border-bottom:1px solid #1a1a2e}
+.sub-tab{padding:4px 10px;font-size:10px;cursor:pointer;border-bottom:2px solid transparent;color:#5a5a6e;font-family:'Courier New',monospace;background:transparent;border-top:none;border-left:none;border-right:none;letter-spacing:1px}
+.sub-tab.active{color:#e8475f;border-bottom-color:#e8475f}
+.help-text{font-size:10px;color:#5a5a6e;margin-top:4px;line-height:1.4}
+.level-bar{display:flex;height:6px;margin-top:6px;border-radius:3px;overflow:hidden;background:#1a1a2e}
+.level-bar .seg{flex:1;border-right:1px solid #0a0a0f;background:#1a1a2e}
+.level-bar .seg.active{background:#e8475f}
 </style>
 </head>
 <body>
 <div class="header">
 <h1>☠ 阴间电台谜题服务</h1>
-<p>UNDERWORLD RADIO PUZZLE SERVICE // DEBUG PANEL v1.0</p>
+<p>UNDERWORLD RADIO PUZZLE SERVICE // DEBUG PANEL v1.1</p>
 </div>
 
 <div class="container">
@@ -74,7 +103,7 @@ select{cursor:pointer}
     <label>玩家已获得物品 (逗号分隔)</label>
     <input type="text" id="playerItems" value="生锈的钥匙,旧收音机" placeholder="例: 手电筒,旧钥匙">
     <label>禁止剧透信息 (逗号分隔)</label>
-    <input type="text" id="forbiddenInfo" value="张医生的真实身份" placeholder="例: 最终Boss名称">
+    <input type="text" id="forbiddenInfo" value="张医生的真实身份,太平间深处的房间" placeholder="例: 最终Boss名称">
     <label>谜底类型</label>
     <div class="radio-group" id="answerTypeGroup">
       <label><input type="radio" name="answerType" value="frequency" checked>频率</label>
@@ -89,12 +118,12 @@ select{cursor:pointer}
       <label><input type="radio" name="platform" value="console">主机</label>
       <label><input type="radio" name="platform" value="mobile">移动端</label>
     </div>
-    <div id="sessionIdArea">
-      <label>Session ID (可选)</label>
-      <input type="text" id="sessionId" value="" placeholder="留空则不关联会话">
-    </div>
+    <label>Session ID (可选，用于持续跟踪)</label>
+    <input type="text" id="sessionId" value="" placeholder="留空则不关联会话">
+    <div class="session-info" id="sessionInfo">未创建会话</div>
     <button class="btn" onclick="requestPuzzle()">生成谜题</button>
     <button class="btn secondary" onclick="createSession()">创建会话</button>
+    <button class="btn secondary" onclick="resetSession()">重置会话</button>
   </div>
 
   <div class="section">
@@ -111,17 +140,22 @@ select{cursor:pointer}
     </div>
     <label>最大子步骤</label>
     <input type="number" id="maxSubSteps" value="3" min="1" max="6">
+    <div class="checkbox-row">
+      <input type="checkbox" id="allowAudioOnly">
+      <label for="allowAudioOnly">纯音频谜题</label>
+    </div>
     <button class="btn secondary" onclick="applyDifficulty()">应用约束</button>
-    <button class="btn secondary" onclick="loadPreset('easy')">轻松</button>
-    <button class="btn secondary" onclick="loadPreset('normal')">标准</button>
-    <button class="btn secondary" onclick="loadPreset('hard')">硬核</button>
-    <button class="btn secondary" onclick="loadPreset('nightmare')">噩梦</button>
+    <div class="help-text">选择平台后，超出限制的约束会被自动调整。</div>
   </div>
 
   <div class="section">
     <div class="section-title">🔄 玩家状态适配</div>
-    <label>玩家失败次数</label>
+    <label>失败次数 (直接输入也可，无需先建会话)</label>
     <input type="number" id="failureCount" value="0" min="0" max="20">
+    <div class="level-bar" id="adaptationBar">
+      <div class="seg active"></div><div class="seg"></div><div class="seg"></div><div class="seg"></div>
+    </div>
+    <div style="font-size:10px;color:#6a6a7e;margin-top:2px" id="adaptationLabel">Lv0 原始版本</div>
     <label>强制适配等级 (可选)</label>
     <select id="forceLevel">
       <option value="">自动</option>
@@ -131,16 +165,18 @@ select{cursor:pointer}
       <option value="3">Level 3 - 余烬版本</option>
     </select>
     <button class="btn" onclick="replayPuzzle()">请求重播</button>
-    <button class="btn secondary" onclick="reportFailure()">报告失败</button>
-    <button class="btn secondary" onclick="viewAdaptationLevels()">查看适配等级</button>
+    <button class="btn secondary" onclick="reportFailure()">报告一次失败</button>
+    <button class="btn secondary" onclick="viewAdaptationLevels()">查看等级</button>
   </div>
 </div>
 
 <div class="right">
   <div class="tabs">
     <button class="tab active" onclick="switchTab('result')">结果</button>
+    <button class="tab" onclick="switchTab('drafts')">草稿库</button>
     <button class="tab" onclick="switchTab('raw')">原始JSON</button>
   </div>
+
   <div id="tab-result" class="tab-content active">
     <div id="resultArea">
       <div style="color:#4a4a5e;font-size:13px;padding:40px;text-align:center;letter-spacing:1px">
@@ -148,15 +184,64 @@ select{cursor:pointer}
       </div>
     </div>
   </div>
+
+  <div id="tab-drafts" class="tab-content">
+    <div class="section">
+      <div class="section-title">📚 谜题草稿库 <span class="toggle" onclick="refreshDrafts()">刷新</span></div>
+      <div class="filter-row">
+        <select id="filterStatus" onchange="refreshDrafts()">
+          <option value="">全部状态</option>
+          <option value="draft">草稿</option>
+          <option value="adopted">已采用</option>
+          <option value="archived">已归档</option>
+        </select>
+        <select id="filterAnswerType" onchange="refreshDrafts()">
+          <option value="">全部类型</option>
+          <option value="frequency">频率</option>
+          <option value="date">日期</option>
+          <option value="name">人名</option>
+          <option value="direction">方位</option>
+          <option value="code">代码</option>
+        </select>
+      </div>
+      <div class="filter-row">
+        <input type="text" id="filterMap" placeholder="按地图搜索..." oninput="debounce(refreshDrafts, 300)">
+        <select id="filterPlatform" onchange="refreshDrafts()">
+          <option value="">全部平台</option>
+          <option value="pc">PC</option>
+          <option value="console">主机</option>
+          <option value="mobile">移动端</option>
+        </select>
+      </div>
+      <div style="font-size:10px;color:#5a5a6e;margin-bottom:6px" id="draftCount">共 0 个草稿</div>
+      <div id="draftsList">
+        <div class="empty-state">加载中...</div>
+      </div>
+    </div>
+
+    <div id="draftDetail" style="display:none">
+      <div class="section">
+        <div class="section-title">📄 草稿详情</div>
+        <div id="draftDetailContent"></div>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn small" onclick="saveCurrentDraft()">保存当前结果为草稿</button>
+          <button class="btn secondary small" onclick="adoptDraft()">标记为已采用</button>
+          <button class="btn secondary small" onclick="archiveDraft()">归档</button>
+          <button class="btn secondary small" onclick="deleteDraft()">删除</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="tab-raw" class="tab-content">
-    <div id="rawArea" class="raw-json">等待请求...</div>
+    <div id="rawArea" class="raw-json" style="background:#0e0e18;border:1px solid #2a2a3e;padding:10px;font-size:10px;color:#6a6a7e;white-space:pre-wrap;max-height:calc(100vh - 200px);overflow-y:auto;margin-top:8px">等待请求...</div>
   </div>
 </div>
 </div>
 
 <div class="status-bar">
   <span id="statusText">就绪</span>
-  <span id="sessionInfo">未创建会话</span>
+  <span id="draftBarInfo">草稿: --</span>
   <span id="lastRequestTime">-</span>
 </div>
 
@@ -164,29 +249,58 @@ select{cursor:pointer}
 const API_BASE = '/api';
 let currentResult = null;
 let currentSessionId = null;
+let currentDraftId = null;
+let draftListCache = [];
+let debounceTimer = null;
 
 function $(id) { return document.getElementById(id); }
 function getRadioValue(name) {
   const el = document.querySelector(`input[name="${name}"]:checked`);
   return el ? el.value : null;
 }
+function escHtml(str) {
+  const d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+function debounce(fn, ms) {
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(fn, ms);
+}
 
 function updateStatus(text) { $('statusText').textContent = text; }
 function updateSessionInfo() {
-  $('sessionInfo').textContent = currentSessionId ? `会话: ${currentSessionId.substring(0,8)}...` : '未创建会话';
+  const info = $('sessionInfo');
+  if (currentSessionId) {
+    info.textContent = '会话: ' + currentSessionId.substring(0, 8) + '...';
+    info.style.color = '#4a9eff';
+  } else {
+    info.textContent = '未创建会话 (可直接使用失败次数字段)';
+    info.style.color = '#6a6a7e';
+  }
+}
+
+function updateAdaptationBar(failureCount) {
+  const level = Math.min(3, Math.floor(failureCount / 2));
+  const segs = document.querySelectorAll('#adaptationBar .seg');
+  segs.forEach((s, i) => {
+    s.classList.toggle('active', i <= level);
+  });
+  const labels = ['原始版本', '微光版本', '回声版本', '余烬版本'];
+  $('adaptationLabel').textContent = `Lv${level} ${labels[level]}`;
 }
 
 async function apiCall(method, path, body) {
   const start = Date.now();
-  updateStatus(`请求中: ${method} ${path}`);
+  updateStatus('请求中: ' + method + ' ' + path);
   try {
     const opts = { method, headers: { 'Content-Type': 'application/json' } };
     if (body) opts.body = JSON.stringify(body);
-    const res = await fetch(`${API_BASE}${path}`, opts);
+    const res = await fetch(API_BASE + path, opts);
     const data = await res.json();
     const elapsed = Date.now() - start;
-    $('lastRequestTime').textContent = `${elapsed}ms`;
-    updateStatus(res.ok ? '完成' : `错误 ${res.status}`);
+    $('lastRequestTime').textContent = elapsed + 'ms';
+    updateStatus(res.ok ? '完成' : '错误 ' + res.status);
     return { ok: res.ok, data, status: res.status };
   } catch (e) {
     updateStatus('网络错误');
@@ -214,6 +328,7 @@ function buildDifficulty() {
     allowReversePlayback: $('allowReversePlayback').checked,
     requiresPenAndPaper: $('requiresPenAndPaper').checked,
     maxSubSteps: parseInt($('maxSubSteps').value) || 3,
+    allowAudioOnly: $('allowAudioOnly').checked,
     platform: getRadioValue('platform'),
   };
 }
@@ -222,8 +337,12 @@ async function requestPuzzle() {
   const body = buildPuzzleRequest();
   const { ok, data } = await apiCall('POST', '/puzzle/request', body);
   currentResult = data;
-  if (ok) renderResult(data);
-  else renderError(data);
+  if (ok) {
+    renderResult(data);
+    updateAdaptationBar(data.adaptation?.failureCount || 0);
+  } else {
+    renderError(data);
+  }
   $('rawArea').textContent = JSON.stringify(data, null, 2);
 }
 
@@ -233,34 +352,52 @@ async function createSession() {
     currentSessionId = data.sessionId;
     $('sessionId').value = data.sessionId;
     updateSessionInfo();
+    $('failureCount').value = 0;
+    updateAdaptationBar(0);
   }
   $('rawArea').textContent = JSON.stringify(data, null, 2);
+}
+
+async function resetSession() {
+  if (!currentSessionId) {
+    updateStatus('先创建会话');
+    return;
+  }
+  const { ok, data } = await apiCall('POST', `/session/${currentSessionId}/reset`);
+  if (ok) {
+    $('failureCount').value = 0;
+    updateAdaptationBar(0);
+    updateStatus('会话已重置');
+  }
 }
 
 async function applyDifficulty() {
-  const body = { platform: getRadioValue('platform'), overrides: buildDifficulty() };
+  const body = {
+    platform: getRadioValue('platform'),
+    overrides: buildDifficulty(),
+    answerType: getRadioValue('answerType'),
+  };
   const { ok, data } = await apiCall('POST', '/difficulty/apply', body);
+  if (ok && data.constraints) {
+    $('minClueAppearances').value = data.constraints.minClueAppearances;
+    $('allowReversePlayback').checked = data.constraints.allowReversePlayback;
+    $('requiresPenAndPaper').checked = data.constraints.requiresPenAndPaper;
+    $('maxSubSteps').value = data.constraints.maxSubSteps;
+    if (data.adjustments && data.adjustments.length > 0) {
+      updateStatus('已应用 ' + data.adjustments.length + ' 条平台约束');
+    } else {
+      updateStatus('约束已应用，无需调整');
+    }
+  }
   $('rawArea').textContent = JSON.stringify(data, null, 2);
-  if (ok && data.warnings) {
-    data.warnings.forEach(w => console.warn('[Difficulty]', w));
-  }
-}
-
-async function loadPreset(preset) {
-  const { ok, data } = await apiCall('GET', '/difficulty/presets', null);
-  if (ok && data.presets[preset]) {
-    const c = data.presets[preset].constraints;
-    $('minClueAppearances').value = c.minClueAppearances;
-    $('allowReversePlayback').checked = c.allowReversePlayback;
-    $('requiresPenAndPaper').checked = c.requiresPenAndPaper;
-    $('maxSubSteps').value = c.maxSubSteps;
-    updateStatus(`已加载预设: ${data.presets[preset].label}`);
-  }
 }
 
 async function replayPuzzle() {
+  const forceLevel = $('forceLevel').value !== '' ? parseInt($('forceLevel').value) : undefined;
   const body = {
     sessionId: currentSessionId || undefined,
+    failureCount: parseInt($('failureCount').value) || 0,
+    forceLevel,
     puzzleRequest: {
       chapterId: $('chapterId').value,
       currentMap: $('currentMap').value,
@@ -270,32 +407,34 @@ async function replayPuzzle() {
       platform: getRadioValue('platform'),
     },
     difficulty: buildDifficulty(),
-    forceLevel: $('forceLevel').value !== '' ? parseInt($('forceLevel').value) : undefined,
   };
   const { ok, data } = await apiCall('POST', '/adaptation/replay', body);
   currentResult = data;
-  if (ok) renderResult(data);
-  else renderError(data);
+  if (ok) {
+    renderResult(data);
+    updateAdaptationBar(data.failureCount || 0);
+  } else {
+    renderError(data);
+  }
   $('rawArea').textContent = JSON.stringify(data, null, 2);
 }
 
 async function reportFailure() {
-  if (!currentSessionId) {
-    updateStatus('请先创建会话');
-    return;
-  }
-  const { ok, data } = await apiCall('POST', '/adaptation/report-failure', {
-    sessionId: currentSessionId,
-  });
+  const body = {
+    sessionId: currentSessionId || undefined,
+    currentFailureCount: parseInt($('failureCount').value) || 0,
+  };
+  const { ok, data } = await apiCall('POST', '/adaptation/report-failure', body);
   if (ok) {
     $('failureCount').value = data.failureCount;
-    updateStatus(`失败次数: ${data.failureCount} | 适配等级: ${data.adaptationLabel}`);
+    updateAdaptationBar(data.failureCount);
+    updateStatus('失败: ' + data.failureCount + '次 | 下次重播: ' + data.nextReplayWillBe);
   }
   $('rawArea').textContent = JSON.stringify(data, null, 2);
 }
 
 async function viewAdaptationLevels() {
-  const { ok, data } = await apiCall('GET', '/adaptation/levels', null);
+  const { ok, data } = await apiCall('GET', '/adaptation/levels');
   $('rawArea').textContent = JSON.stringify(data, null, 2);
   if (ok) {
     let html = '<div class="result-box"><div class="section-title">适配等级一览</div>';
@@ -303,27 +442,33 @@ async function viewAdaptationLevels() {
       html += `<div class="clue-item" style="border-left-color:#e8475f">
         <div style="color:#e8475f;font-size:11px">Level ${l.level} - ${l.label}</div>
         <div style="font-size:12px;margin-top:4px">${l.description}</div>
-        <div style="font-size:10px;color:#6a6a7e;margin-top:4px">清晰度 ×${l.clarityMultiplier} | 额外线索 +${l.extraClues} | 揭示直接线索: ${l.revealDirectClue ? '是' : '否'}</div>
+        <div style="font-size:10px;color:#6a6a7e;margin-top:4px">清晰度 ×${l.clarityMultiplier} | 额外线索 +${l.extraClues} | 揭示直接线索: ${l.revealDirectClue ? '是' : '否'} | 进入条件: ${l.minFailures}次失败</div>
       </div>`;
     });
     html += '</div>';
     $('resultArea').innerHTML = html;
+    switchTab('result');
   }
 }
 
 function switchTab(tab) {
   document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelector(`.tab:nth-child(${tab === 'result' ? 1 : 2})`).classList.add('active');
-  $(`tab-${tab}`).classList.add('active');
+  const tabIdx = ['result', 'drafts', 'raw'].indexOf(tab);
+  document.querySelectorAll('.tab')[tabIdx].classList.add('active');
+  $('tab-' + tab).classList.add('active');
+  if (tab === 'drafts') {
+    refreshDrafts();
+  }
 }
 
 function renderResult(data) {
   let html = '';
 
   if (data.broadcast) {
+    const tplLabel = data.broadcast.templateLabel || data.broadcast.templateId || 'BROADCAST';
     html += `<div class="result-box">
-      <div class="tag">${data.broadcast.templateLabel || data.broadcast.templateId || 'BROADCAST'}</div>
+      <div class="tag">${escHtml(tplLabel)}</div>
       <div class="section-title">📻 电台广播</div>
       <div class="broadcast-text">${escHtml(data.broadcast.text)}</div>
     </div>`;
@@ -337,6 +482,20 @@ function renderResult(data) {
       <div class="section-title">🔑 谜底</div>
       <div class="answer-box">类型: ${data.answer.type} | 答案: ${escHtml(String(answerDisplay))}</div>
     </div>`;
+  }
+
+  if (data.spoilerFilter && data.spoilerFilter.applied && data.spoilerFilter.filteredItems?.length > 0) {
+    html += `<div class="result-box">
+      <div class="section-title">🚫 剧透过滤 (${data.spoilerFilter.totalReplacements}处替换)</div>`;
+    data.spoilerFilter.filteredItems.forEach(item => {
+      html += `<div class="spoiler-item">
+        <span class="spoiler-count">×${item.occurrences} 处</span>
+        <span class="spoiler-original">${escHtml(item.original)}</span>
+        <span class="spoiler-replacement">→ ${escHtml(item.replacement)}</span>
+        <span style="font-size:9px;color:#6a6a7e;margin-left:6px">[${item.category}]</span>
+      </div>`;
+    });
+    html += '</div>';
   }
 
   if (data.clues && data.clues.length) {
@@ -373,21 +532,43 @@ function renderResult(data) {
       <div class="section-title">📊 元信息</div>
       <div class="difficulty-info">`;
     if (data.difficulty) {
-      html += `<span class="diff-tag">难度: ${escHtml(data.difficulty.label || '')}</span>`;
-      html += `<span class="diff-tag">线索出现≥${data.difficulty.minClueAppearances}次</span>`;
+      html += `<span class="diff-tag">难度标签: ${escHtml(data.difficulty.label || '')}</span>`;
+      html += `<span class="diff-tag">线索≥${data.difficulty.minClueAppearances}次</span>`;
       html += `<span class="diff-tag">倒放: ${data.difficulty.allowReversePlayback ? '✓' : '✗'}</span>`;
       html += `<span class="diff-tag">纸笔: ${data.difficulty.requiresPenAndPaper ? '✓' : '✗'}</span>`;
+      html += `<span class="diff-tag">子步骤: ${data.difficulty.maxSubSteps}</span>`;
     }
     if (data.adaptation) {
       html += `<span class="diff-tag">适配: Lv${data.adaptation.adaptationLevel} ${escHtml(data.adaptation.adaptationLabel || '')}</span>`;
       html += `<span class="diff-tag">失败: ${data.adaptation.failureCount}次</span>`;
     }
+    if (data.platform) {
+      html += `<span class="diff-tag">平台: ${data.platform}</span>`;
+    }
     html += '</div></div>';
   }
 
-  if (data.platformWarnings && data.platformWarnings.length) {
+  if (data.platformAdjustments && data.platformAdjustments.length > 0) {
+    html += `<div class="result-box">
+      <div class="section-title">⚠ 平台约束调整 (${data.platformAdjustments.length})</div>`;
+    data.platformAdjustments.forEach(a => {
+      const fromVal = a.from !== undefined && a.from !== null ? `<span class="from">${escHtml(String(a.from))}</span> → ` : '';
+      const toVal = `<span class="to">${escHtml(String(a.to))}</span>`;
+      html += `<div class="adjustment-item">
+        <strong>${escHtml(a.field)}</strong>: ${fromVal}${toVal}
+        <div style="font-size:10px;color:#6a6a7e;margin-top:2px">${escHtml(a.reason)}</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if (data.platformWarnings && data.platformWarnings.length > 0) {
     html += `<div class="warning-box">⚠ ${data.platformWarnings.map(escHtml).join('<br>⚠ ')}</div>`;
   }
+
+  html += `<div style="text-align:right;margin-top:10px">
+    <button class="btn small" onclick="saveCurrentDraft()">保存为草稿</button>
+  </div>`;
 
   $('resultArea').innerHTML = html;
 }
@@ -399,11 +580,156 @@ function renderError(data) {
   </div>`;
 }
 
-function escHtml(str) {
-  const d = document.createElement('div');
-  d.textContent = str;
-  return d.innerHTML;
+async function refreshDrafts() {
+  const params = new URLSearchParams();
+  const status = $('filterStatus').value;
+  const answerType = $('filterAnswerType').value;
+  const map = $('filterMap').value.trim();
+  const platform = $('filterPlatform').value;
+  if (status) params.set('status', status);
+  if (answerType) params.set('answerType', answerType);
+  if (map) params.set('currentMap', map);
+  if (platform) params.set('platform', platform);
+
+  const { ok, data } = await apiCall('GET', '/drafts?' + params.toString());
+  if (ok) {
+    draftListCache = data.drafts || [];
+    $('draftCount').textContent = `共 ${data.total} 个草稿`;
+    $('draftBarInfo').textContent = `草稿: ${data.total}`;
+    renderDraftsList(data.drafts || []);
+  }
 }
+
+function renderDraftsList(drafts) {
+  if (drafts.length === 0) {
+    $('draftsList').innerHTML = '<div class="empty-state">暂无草稿，先生成并保存一个吧</div>';
+    return;
+  }
+
+  const statusLabels = { draft: '草稿', adopted: '已采用', archived: '已归档' };
+  const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
+
+  let html = '';
+  drafts.forEach(d => {
+    const mapText = d.currentMap || '未指定地图';
+    html += `<div class="draft-item ${d.status}" onclick="openDraft('${d.draftId}')">
+      <div class="draft-title">${escHtml(mapText)} · ${escHtml(typeLabels[d.answerType] || d.answerType)}</div>
+      <div class="draft-meta">
+        <span class="status">${escHtml(statusLabels[d.status] || d.status)}</span>
+        <span>${d.platform || 'pc'}</span>
+        <span>Lv${d.difficulty?.level || 0}</span>
+        <span>${new Date(d.updatedAt).toLocaleDateString('zh-CN')}</span>
+      </div>
+      <div style="font-size:10px;color:#5a5a6e;margin-top:4px;line-height:1.4;height:28px;overflow:hidden">${escHtml(d.broadcastPreview || '')}</div>
+    </div>`;
+  });
+  $('draftsList').innerHTML = html;
+}
+
+async function openDraft(draftId) {
+  const { ok, data } = await apiCall('GET', '/drafts/' + draftId);
+  if (ok) {
+    currentDraftId = draftId;
+    currentResult = data;
+    $('draftDetail').style.display = 'block';
+    renderDraftDetail(data);
+    renderResult(data);
+    $('rawArea').textContent = JSON.stringify(data, null, 2);
+    switchTab('result');
+  }
+}
+
+function renderDraftDetail(draft) {
+  const statusLabels = { draft: '草稿', adopted: '已采用', archived: '已归档' };
+  let html = `<div style="font-size:12px;margin-bottom:6px">
+    <strong>章节:</strong> ${escHtml(draft.chapterId || '-')}<br>
+    <strong>地图:</strong> ${escHtml(draft.currentMap || '-')}<br>
+    <strong>类型:</strong> ${escHtml(draft.answerType || '-')}<br>
+    <strong>状态:</strong> ${escHtml(statusLabels[draft.status] || draft.status)}<br>
+    <strong>更新:</strong> ${escHtml(draft.updatedAt || '-')}
+  </div>`;
+  if (draft.notes) {
+    html += `<div style="font-size:11px;color:#8a8a9e;padding:6px;background:#12121e;border-radius:2px">${escHtml(draft.notes)}</div>`;
+  }
+  if (draft.tags && draft.tags.length > 0) {
+    html += '<div style="margin-top:6px">';
+    draft.tags.forEach(t => {
+      html += `<span style="font-size:10px;padding:1px 6px;border:1px solid #2a2a3e;margin-right:4px;color:#6a6a7e">${escHtml(t)}</span>`;
+    });
+    html += '</div>';
+  }
+  $('draftDetailContent').innerHTML = html;
+}
+
+async function saveCurrentDraft() {
+  if (!currentResult) {
+    updateStatus('先获取一个谜题结果');
+    return;
+  }
+  const body = {
+    puzzleData: currentResult,
+    meta: {
+      chapterId: $('chapterId').value,
+      currentMap: $('currentMap').value,
+      answerType: currentResult.answer?.type,
+      platform: getRadioValue('platform'),
+      difficulty: currentResult.difficulty,
+      adaptation: currentResult.adaptation,
+      forbiddenInfo: $('forbiddenInfo').value.split(',').map(s => s.trim()).filter(Boolean),
+      filteredSpoilers: currentResult.spoilerFilter?.filteredItems || [],
+      notes: '',
+    },
+  };
+  const { ok, data } = await apiCall('POST', '/drafts', body);
+  if (ok) {
+    currentDraftId = data.draftId;
+    updateStatus('已保存为草稿');
+    refreshDrafts();
+  }
+}
+
+async function adoptDraft() {
+  if (!currentDraftId) return;
+  const { ok } = await apiCall('PATCH', '/drafts/' + currentDraftId + '/status', { status: 'adopted' });
+  if (ok) {
+    updateStatus('标记为已采用');
+    refreshDrafts();
+  }
+}
+
+async function archiveDraft() {
+  if (!currentDraftId) return;
+  const { ok } = await apiCall('PATCH', '/drafts/' + currentDraftId + '/status', { status: 'archived' });
+  if (ok) {
+    updateStatus('已归档');
+    refreshDrafts();
+  }
+}
+
+async function deleteDraft() {
+  if (!currentDraftId) return;
+  if (!confirm('确认删除此草稿？')) return;
+  const { ok } = await apiCall('DELETE', '/drafts/' + currentDraftId);
+  if (ok) {
+    currentDraftId = null;
+    $('draftDetail').style.display = 'none';
+    updateStatus('已删除');
+    refreshDrafts();
+  }
+}
+
+$('failureCount').addEventListener('input', function() {
+  updateAdaptationBar(parseInt(this.value) || 0);
+});
+
+$('forceLevel').addEventListener('change', function() {
+  if (this.value !== '') {
+    updateAdaptationBar(parseInt(this.value) * 2);
+  }
+});
+
+updateSessionInfo();
+updateAdaptationBar(0);
 </script>
 </body>
 </html>

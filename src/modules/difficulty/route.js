@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { createDifficultyConstraint, VALID_PLATFORMS } = require('../../models/schemas');
+const { applyPlatformLimits, PLATFORM_LIMITS } = require('../puzzle/generator');
 
 const PLATFORM_PROFILES = {
   pc: {
@@ -17,24 +18,24 @@ const PLATFORM_PROFILES = {
   },
   console: {
     label: '主机 / 手柄',
-    description: '简化输入、禁用纸笔要求、限制子步骤',
+    description: '简化输入、禁用纸笔要求、限制子步骤、数字串不超过3位',
     defaultConstraints: {
       minClueAppearances: 2,
       allowReversePlayback: true,
       requiresPenAndPaper: false,
-      maxSubSteps: 4,
+      maxSubSteps: 3,
       timeLimitSeconds: null,
       allowAudioOnly: false,
     },
   },
   mobile: {
     label: '移动端 / 触屏',
-    description: '极简输入、短广播、更少子步骤',
+    description: '极简输入、不可倒放、短广播、最少子步骤、数字串不超过2位',
     defaultConstraints: {
       minClueAppearances: 3,
       allowReversePlayback: false,
       requiresPenAndPaper: false,
-      maxSubSteps: 3,
+      maxSubSteps: 2,
       timeLimitSeconds: 120,
       allowAudioOnly: false,
     },
@@ -42,18 +43,18 @@ const PLATFORM_PROFILES = {
 };
 
 router.get('/platforms', (req, res) => {
-  res.json({
-    platforms: Object.entries(PLATFORM_PROFILES).map(([key, profile]) => ({
-      id: key,
-      label: profile.label,
-      description: profile.description,
-      defaultConstraints: profile.defaultConstraints,
-    })),
-  });
+  const platforms = Object.entries(PLATFORM_PROFILES).map(([key, profile]) => ({
+    id: key,
+    label: profile.label,
+    description: profile.description,
+    defaultConstraints: profile.defaultConstraints,
+    limits: PLATFORM_LIMITS[key],
+  }));
+  res.json({ platforms });
 });
 
 router.post('/apply', (req, res) => {
-  const { platform, overrides } = req.body;
+  const { platform, overrides, answerType } = req.body;
 
   const selectedPlatform = platform || 'pc';
   if (!VALID_PLATFORMS.includes(selectedPlatform)) {
@@ -75,44 +76,16 @@ router.post('/apply', (req, res) => {
     });
   }
 
-  const warnings = [];
-  const adjusted = { ...base };
+  if (answerType) base.answerType = answerType;
 
-  if (selectedPlatform === 'console' && adjusted.requiresPenAndPaper) {
-    adjusted.requiresPenAndPaper = false;
-    warnings.push('主机平台不支持纸笔记录要求，已自动调整为false');
-  }
-
-  if (selectedPlatform === 'mobile') {
-    if (adjusted.requiresPenAndPaper) {
-      adjusted.requiresPenAndPaper = false;
-      warnings.push('移动端不支持纸笔记录要求，已自动调整为false');
-    }
-    if (adjusted.maxSubSteps > 4) {
-      adjusted.maxSubSteps = 4;
-      warnings.push('移动端最大子步骤已限制为4');
-    }
-    if (adjusted.allowAudioOnly) {
-      adjusted.allowAudioOnly = false;
-      warnings.push('移动端不推荐纯音频谜题，已自动调整为false');
-    }
-  }
-
-  if (adjusted.minClueAppearances < 1) {
-    adjusted.minClueAppearances = 1;
-    warnings.push('线索出现次数不能小于1，已自动调整为1');
-  }
-
-  if (adjusted.maxSubSteps < 1) {
-    adjusted.maxSubSteps = 1;
-    warnings.push('子步骤数不能小于1，已自动调整为1');
-  }
+  const { constraints: adjusted, adjustments } = applyPlatformLimits(base, selectedPlatform);
 
   res.json({
     platform: selectedPlatform,
     platformLabel: profile.label,
     constraints: adjusted,
-    warnings: warnings.length > 0 ? warnings : undefined,
+    adjustments: adjustments.length > 0 ? adjustments : [],
+    warnings: adjustments.length > 0 ? adjustments.map(a => a.reason) : undefined,
   });
 });
 
@@ -169,6 +142,10 @@ router.get('/presets', (req, res) => {
   };
 
   res.json({ presets });
+});
+
+router.get('/platform-limits', (req, res) => {
+  res.json({ limits: PLATFORM_LIMITS });
 });
 
 module.exports = router;

@@ -5,9 +5,104 @@ const { NARRATIVE_HOOKS, formatHook } = require('../../templates/hooks');
 const { WRONG_FEEDBACK_TEMPLATES } = require('../../templates/wrongFeedback');
 const { REPLAY_ADAPTATIONS, getAdaptationLevel } = require('../../templates/adaptations');
 const { FREQUENCY_RANGES, DATE_CONTEXTS, DIRECTION_VALUES } = require('../../models/schemas');
+const { filterSpoilersInPuzzle } = require('../../utils/spoilerFilter');
 
 function randomPick(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+const PLATFORM_LIMITS = {
+  pc: {
+    maxCodeLength: 6,
+    maxSubSteps: 6,
+    allowPenAndPaper: true,
+    allowReversePlayback: true,
+    allowAudioOnly: true,
+    minClueAppearances: 1,
+  },
+  console: {
+    maxCodeLength: 3,
+    maxSubSteps: 3,
+    allowPenAndPaper: false,
+    allowReversePlayback: true,
+    allowAudioOnly: false,
+    minClueAppearances: 2,
+  },
+  mobile: {
+    maxCodeLength: 2,
+    maxSubSteps: 2,
+    allowPenAndPaper: false,
+    allowReversePlayback: false,
+    allowAudioOnly: false,
+    minClueAppearances: 3,
+  },
+};
+
+function applyPlatformLimits(constraints, platform) {
+  const limits = PLATFORM_LIMITS[platform] || PLATFORM_LIMITS.pc;
+  const adjusted = { ...constraints };
+  const adjustments = [];
+
+  if (adjusted.maxSubSteps > limits.maxSubSteps) {
+    adjustments.push({
+      field: 'maxSubSteps',
+      from: adjusted.maxSubSteps,
+      to: limits.maxSubSteps,
+      reason: `${platform}平台子步骤上限为${limits.maxSubSteps}，避免复杂输入`,
+    });
+    adjusted.maxSubSteps = limits.maxSubSteps;
+  }
+
+  if (!limits.allowPenAndPaper && adjusted.requiresPenAndPaper) {
+    adjustments.push({
+      field: 'requiresPenAndPaper',
+      from: true,
+      to: false,
+      reason: `${platform}平台不支持纸笔记录要求，已关闭`,
+    });
+    adjusted.requiresPenAndPaper = false;
+  }
+
+  if (!limits.allowReversePlayback && adjusted.allowReversePlayback) {
+    adjustments.push({
+      field: 'allowReversePlayback',
+      from: true,
+      to: false,
+      reason: `${platform}平台默认不支持倒放，已关闭`,
+    });
+    adjusted.allowReversePlayback = false;
+  }
+
+  if (!limits.allowAudioOnly && adjusted.allowAudioOnly) {
+    adjustments.push({
+      field: 'allowAudioOnly',
+      from: true,
+      to: false,
+      reason: `${platform}平台不推荐纯音频谜题，已关闭`,
+    });
+    adjusted.allowAudioOnly = false;
+  }
+
+  if (adjusted.minClueAppearances < limits.minClueAppearances) {
+    adjustments.push({
+      field: 'minClueAppearances',
+      from: adjusted.minClueAppearances,
+      to: limits.minClueAppearances,
+      reason: `${platform}平台线索最少出现${limits.minClueAppearances}次，保证玩家能跟上`,
+    });
+    adjusted.minClueAppearances = limits.minClueAppearances;
+  }
+
+  if (platform === 'console' && adjusted.answerType === 'code') {
+    if (!adjusted.codeLength || adjusted.codeLength > limits.maxCodeLength) {
+      adjusted.codeLength = limits.maxCodeLength;
+    }
+  }
+  if (platform === 'mobile') {
+    adjusted.codeLength = limits.maxCodeLength;
+  }
+
+  return { constraints: adjusted, adjustments };
 }
 
 function generateAnswer(answerType, constraints) {
@@ -36,9 +131,10 @@ function generateAnswer(answerType, constraints) {
       return { type: 'direction', value: dir, display: dir };
     }
     case 'code': {
-      const length = constraints?.maxSubSteps ?? 4;
+      const length = constraints?.codeLength || constraints?.maxSubSteps || 4;
+      const effectiveLength = Math.min(Math.max(1, length), 6);
       const digits = [];
-      for (let i = 0; i < length; i++) {
+      for (let i = 0; i < effectiveLength; i++) {
         digits.push(String(Math.floor(Math.random() * 10)));
       }
       const code = digits.join('');
@@ -93,7 +189,7 @@ function generateClues(answer, currentMap, difficulty, adaptationLevel) {
   const usedIndices = { direct: new Set(), indirect: new Set(), environmental: new Set() };
 
   const directCount = adaptationLevel.revealDirectClue
-    ? Math.min(totalNeeded, templates.direct.length)
+    ? Math.min(Math.max(1, Math.ceil(totalNeeded * 0.5)), templates.direct.length)
     : Math.min(Math.max(1, Math.ceil(totalNeeded * 0.3)), templates.direct.length);
 
   for (let i = 0; i < directCount && i < templates.direct.length; i++) {
@@ -218,7 +314,7 @@ function generatePuzzle(request, difficulty, playerState) {
 
   const puzzleId = uuidv4();
 
-  return {
+  let puzzle = {
     puzzleId,
     chapterId: request.chapterId,
     createdAt: new Date().toISOString(),
@@ -238,14 +334,26 @@ function generatePuzzle(request, difficulty, playerState) {
       minClueAppearances: difficulty.minClueAppearances,
       allowReversePlayback: difficulty.allowReversePlayback,
       requiresPenAndPaper: difficulty.requiresPenAndPaper,
+      maxSubSteps: difficulty.maxSubSteps,
+      allowAudioOnly: difficulty.allowAudioOnly,
     },
     adaptation: {
       failureCount: playerState.failureCount,
       adaptationLevel: adaptation.level,
       adaptationLabel: adaptation.label,
     },
+    platform: difficulty.platform || 'pc',
+    platformAdjustments: difficulty._adjustments || [],
     forbiddenInfoFiltered: request.forbiddenInfo.length > 0,
   };
+
+  if (request.forbiddenInfo && request.forbiddenInfo.length > 0) {
+    puzzle = filterSpoilersInPuzzle(puzzle, request.forbiddenInfo);
+  } else {
+    puzzle.spoilerFilter = { applied: false, filteredItems: [] };
+  }
+
+  return puzzle;
 }
 
 module.exports = {
@@ -256,4 +364,6 @@ module.exports = {
   generateWrongFeedback,
   generateSuccessHook,
   getAdaptationLevel,
+  applyPlatformLimits,
+  PLATFORM_LIMITS,
 };

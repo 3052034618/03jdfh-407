@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { createPuzzleRequest, createDifficultyConstraint, createPlayerState } = require('../../models/schemas');
-const { generatePuzzle } = require('./generator');
-const { getSession, addPuzzleToSession } = require('../../store/sessionStore');
+const { generatePuzzle, applyPlatformLimits } = require('./generator');
+const { getSession, addPuzzleToSession, updatePlayerState } = require('../../store/sessionStore');
 
 router.post('/request', (req, res) => {
   const puzzleReq = createPuzzleRequest(req.body);
@@ -14,53 +14,47 @@ router.post('/request', (req, res) => {
   }
 
   const difficultyInput = req.body.difficulty || {};
-  const difficulty = createDifficultyConstraint({
+  const platform = difficultyInput.platform || puzzleReq.platform || 'pc';
+
+  const baseDifficulty = createDifficultyConstraint({
     ...difficultyInput,
-    platform: difficultyInput.platform || puzzleReq.platform,
+    platform,
   });
 
-  if (difficulty.platform === 'console' && difficulty.requiresPenAndPaper) {
-    difficulty.requiresPenAndPaper = false;
-    difficulty._adjustedPenAndPaper = true;
-  }
-  if (difficulty.platform === 'mobile' && difficulty.maxSubSteps > 4) {
-    difficulty.maxSubSteps = 4;
-    difficulty._adjustedMaxSubSteps = true;
-  }
+  const { constraints: adjustedDifficulty, adjustments } = applyPlatformLimits(baseDifficulty, platform);
+  adjustedDifficulty._adjustments = adjustments;
+  adjustedDifficulty.platform = platform;
 
-  const playerStateInput = req.body.playerState || {};
   const sessionId = req.body.sessionId;
-  let playerState;
+  let playerState = createPlayerState(req.body.playerState || {});
+  let session = null;
 
   if (sessionId) {
-    const session = getSession(sessionId);
+    session = getSession(sessionId);
     if (session) {
       playerState = {
+        ...playerState,
         ...session.playerState,
-        ...playerStateInput,
+        ...(req.body.playerState || {}),
       };
-    } else {
-      playerState = createPlayerState(playerStateInput);
     }
-  } else {
-    playerState = createPlayerState(playerStateInput);
   }
 
-  const puzzle = generatePuzzle(puzzleReq, difficulty, playerState);
+  const requestForGenerator = {
+    ...puzzleReq,
+    forbiddenInfo: puzzleReq.forbiddenInfo || [],
+  };
 
-  if (sessionId) {
+  const puzzle = generatePuzzle(requestForGenerator, adjustedDifficulty, playerState);
+
+  if (sessionId && session) {
     addPuzzleToSession(sessionId, puzzle.puzzleId, puzzle);
+    updatePlayerState(sessionId, { failureCount: playerState.failureCount });
   }
 
-  const platformWarnings = [];
-  if (difficulty._adjustedPenAndPaper) {
-    platformWarnings.push('主机平台不支持纸笔记录要求，已自动关闭');
-  }
-  if (difficulty._adjustedMaxSubSteps) {
-    platformWarnings.push('移动端最大子步骤已限制为4');
-  }
+  const platformWarnings = adjustments.map(a => a.reason);
 
-  res.json({
+  const response = {
     puzzleId: puzzle.puzzleId,
     chapterId: puzzle.chapterId,
     createdAt: puzzle.createdAt,
@@ -71,41 +65,30 @@ router.post('/request', (req, res) => {
     difficulty: puzzle.difficulty,
     adaptation: puzzle.adaptation,
     answer: puzzle.answer,
+    platform: puzzle.platform,
+    platformAdjustments: adjustments,
     platformWarnings: platformWarnings.length > 0 ? platformWarnings : undefined,
+    spoilerFilter: puzzle.spoilerFilter,
     forbiddenInfoFiltered: puzzle.forbiddenInfoFiltered,
-  });
+    sessionId: sessionId || undefined,
+  };
+
+  res.json(response);
 });
 
 router.post('/verify', (req, res) => {
   const { sessionId, puzzleId, answer } = req.body;
-  if (!sessionId || !puzzleId || answer === undefined) {
+  if (!puzzleId || answer === undefined) {
     return res.status(400).json({
       error: 'INVALID_REQUEST',
-      messages: ['sessionId, puzzleId, and answer are required'],
+      messages: ['puzzleId and answer are required'],
     });
   }
 
-  const session = getSession(sessionId);
-  if (!session) {
-    return res.status(404).json({
-      error: 'SESSION_NOT_FOUND',
-      messages: ['No session found with the given sessionId'],
-    });
-  }
-
-  const puzzleRecord = session.puzzles.find(p => p.puzzleId === puzzleId);
-  if (!puzzleRecord) {
-    return res.status(404).json({
-      error: 'PUZZLE_NOT_FOUND',
-      messages: ['No puzzle found in this session with the given puzzleId'],
-    });
-  }
-
-  const { generateAnswer } = require('./generator');
-  const correctAnswer = req.body._correctAnswer;
   let isCorrect = false;
+  const correctAnswer = req.body._correctAnswer;
 
-  if (correctAnswer) {
+  if (correctAnswer !== undefined && correctAnswer !== null) {
     if (typeof correctAnswer === 'object' && correctAnswer.value !== undefined) {
       isCorrect = JSON.stringify(answer) === JSON.stringify(correctAnswer.value);
     } else {
@@ -115,15 +98,36 @@ router.post('/verify', (req, res) => {
     isCorrect = true;
   }
 
-  const updatedSession = require('../../store/sessionStore').recordAttempt(
-    sessionId, puzzleId, answer, isCorrect
-  );
+  let failureCount = 0;
+  let session = null;
+
+  if (sessionId) {
+    session = getSession(sessionId);
+    if (session) {
+      const sessionStore = require('../../store/sessionStore');
+      sessionStore.recordAttempt(sessionId, puzzleId, answer, isCorrect);
+      failureCount = session.playerState.failureCount + (isCorrect ? 0 : 1);
+    }
+  } else {
+    failureCount = (req.body.currentFailureCount || 0) + (isCorrect ? 0 : 1);
+  }
+
+  const { getAdaptationLevel } = require('./generator');
+  const adaptation = getAdaptationLevel(failureCount);
 
   res.json({
     correct: isCorrect,
-    failureCount: updatedSession.playerState.failureCount,
-    adaptationLevel: isCorrect ? 0 : Math.min(3, Math.floor(updatedSession.playerState.failureCount / 2)),
-    message: isCorrect ? '谜题已解决。前方的路已打开。' : '答案不正确。广播将在稍后重播……',
+    failureCount,
+    adaptationLevel: adaptation.level,
+    adaptationLabel: adaptation.label,
+    message: isCorrect
+      ? '谜题已解决。前方的路已打开。'
+      : '答案不正确。广播将在稍后重播……',
+    nextReplay: isCorrect ? null : {
+      level: adaptation.level,
+      label: adaptation.label,
+      description: adaptation.description,
+    },
   });
 });
 

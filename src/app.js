@@ -3,6 +3,7 @@ const path = require('path');
 const puzzleRoute = require('./modules/puzzle/route');
 const difficultyRoute = require('./modules/difficulty/route');
 const adaptationRoute = require('./modules/adaptation/route');
+const draftsRoute = require('./modules/drafts/route');
 const { createSession, getSession, resetSession, listSessions } = require('./store/sessionStore');
 
 const app = express();
@@ -14,6 +15,7 @@ app.use(express.static(path.join(__dirname, '..', 'public')));
 app.use('/api/puzzle', puzzleRoute);
 app.use('/api/difficulty', difficultyRoute);
 app.use('/api/adaptation', adaptationRoute);
+app.use('/api/drafts', draftsRoute);
 
 app.post('/api/session', (req, res) => {
   const { chapterId } = req.body;
