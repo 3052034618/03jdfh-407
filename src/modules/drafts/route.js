@@ -14,6 +14,9 @@ const {
   removeTag,
   rateDraft,
   getDraftStats,
+  updateReviewQueue,
+  batchUpdateReviewQueue,
+  addReviewLog,
 } = require('../../store/draftStore');
 
 router.post('/', (req, res) => {
@@ -49,6 +52,7 @@ router.get('/', (req, res) => {
     status,
     platform,
     difficultyTier,
+    reviewQueue: req.query.reviewQueue,
     tag: req.query.tag,
     section: req.query.section,
     search: req.query.search,
@@ -86,6 +90,8 @@ router.get('/', (req, res) => {
         : '',
       answer: d.answer,
       qualityRating: d.qualityRating,
+      reviewQueue: d.reviewQueue || 'none',
+      reviewLogCount: (d.reviewLog || []).length,
       createdAt: d.createdAt,
       updatedAt: d.updatedAt,
     };
@@ -101,6 +107,18 @@ router.get('/', (req, res) => {
 
 router.get('/stats', (req, res) => {
   res.json(getDraftStats());
+});
+
+router.patch('/batch/review-queue', (req, res) => {
+  const { draftIds, queue } = req.body;
+  if (!Array.isArray(draftIds) || !queue) {
+    return res.status(400).json({
+      error: 'INVALID_REQUEST',
+      messages: ['draftIds (array) and queue are required'],
+    });
+  }
+  const count = batchUpdateReviewQueue(draftIds, queue);
+  res.json({ success: true, updatedCount: count, queue });
 });
 
 router.patch('/batch/status', (req, res) => {
@@ -148,6 +166,42 @@ router.delete('/batch', (req, res) => {
     success: true,
     deletedCount: count,
   });
+});
+
+router.patch('/:draftId/review-queue', (req, res) => {
+  const { queue } = req.body;
+  if (!queue) {
+    return res.status(400).json({
+      error: 'INVALID_REQUEST',
+      messages: ['queue is required (none/pending_review/passed/needs_rewrite)'],
+    });
+  }
+  const draft = updateReviewQueue(req.params.draftId, queue);
+  if (!draft) {
+    return res.status(404).json({
+      error: 'DRAFT_NOT_FOUND',
+      messages: ['No draft found with the given ID'],
+    });
+  }
+  res.json({ success: true, reviewQueue: draft.reviewQueue });
+});
+
+router.post('/:draftId/review-log', (req, res) => {
+  const { action, decision, comment, reviewer } = req.body;
+  if (!action && !decision && !comment) {
+    return res.status(400).json({
+      error: 'INVALID_REQUEST',
+      messages: ['At least one of action, decision, or comment is required'],
+    });
+  }
+  const draft = addReviewLog(req.params.draftId, { action, decision, comment, reviewer });
+  if (!draft) {
+    return res.status(404).json({
+      error: 'DRAFT_NOT_FOUND',
+      messages: ['No draft found with the given ID'],
+    });
+  }
+  res.json({ success: true, reviewLog: draft.reviewLog });
 });
 
 router.get('/:draftId', (req, res) => {

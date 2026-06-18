@@ -68,6 +68,8 @@ function createDraft(puzzleData, meta = {}) {
     platformAdjustments: meta.platformAdjustments || puzzleData.platformAdjustments || [],
     spoilerFilter: meta.spoilerFilter || puzzleData.spoilerFilter || { applied: false, filteredItems: [] },
     status: 'draft',
+    reviewQueue: 'none',
+    reviewLog: [],
     tags: Array.isArray(meta.tags) ? meta.tags : [],
     notes: meta.notes || '',
     section: meta.section || '',
@@ -130,6 +132,13 @@ function listDrafts(filters = {}) {
     drafts = drafts.filter(d =>
       d.section && d.section.toLowerCase().includes(sec)
     );
+  }
+  if (filters.reviewQueue) {
+    if (Array.isArray(filters.reviewQueue)) {
+      drafts = drafts.filter(d => filters.reviewQueue.includes(d.reviewQueue || 'none'));
+    } else {
+      drafts = drafts.filter(d => (d.reviewQueue || 'none') === filters.reviewQueue);
+    }
   }
   if (filters.search) {
     const q = String(filters.search).toLowerCase();
@@ -262,6 +271,45 @@ function rateDraft(draftId, rating) {
   return updateDraft(draftId, { qualityRating: r });
 }
 
+function updateReviewQueue(draftId, queue) {
+  const valid = ['none', 'pending_review', 'passed', 'needs_rewrite'];
+  if (!valid.includes(queue)) return null;
+  return updateDraft(draftId, { reviewQueue: queue });
+}
+
+function batchUpdateReviewQueue(draftIds, queue) {
+  const valid = ['none', 'pending_review', 'passed', 'needs_rewrite'];
+  if (!Array.isArray(draftIds) || !valid.includes(queue)) return 0;
+  const drafts = readDrafts();
+  const set = new Set(draftIds);
+  let count = 0;
+  drafts.forEach((d, i) => {
+    if (set.has(d.draftId)) {
+      drafts[i] = { ...d, reviewQueue: queue, updatedAt: new Date().toISOString() };
+      count += 1;
+    }
+  });
+  if (count > 0) writeDrafts(drafts);
+  return count;
+}
+
+function addReviewLog(draftId, entry) {
+  const drafts = readDrafts();
+  const idx = drafts.findIndex(d => d.draftId === draftId);
+  if (idx === -1) return null;
+  if (!Array.isArray(drafts[idx].reviewLog)) drafts[idx].reviewLog = [];
+  drafts[idx].reviewLog.push({
+    action: entry.action || 'review',
+    decision: entry.decision || '',
+    comment: entry.comment || '',
+    reviewer: entry.reviewer || 'anonymous',
+    timestamp: new Date().toISOString(),
+  });
+  drafts[idx].updatedAt = new Date().toISOString();
+  writeDrafts(drafts);
+  return drafts[idx];
+}
+
 function getDraftStats() {
   const drafts = readDrafts();
   const stats = {
@@ -272,6 +320,7 @@ function getDraftStats() {
     byDifficultyTier: { easy: 0, standard: 0, hard: 0, nightmare: 0 },
     byPlatform: { pc: 0, console: 0, mobile: 0 },
     byMap: {},
+    byReviewQueue: { none: 0, pending_review: 0, passed: 0, needs_rewrite: 0 },
     averageRating: 0,
     ratedCount: 0,
   };
@@ -283,6 +332,8 @@ function getDraftStats() {
     stats.byDifficultyTier[d.difficultyTier] = (stats.byDifficultyTier[d.difficultyTier] || 0) + 1;
     stats.byPlatform[d.platform] = (stats.byPlatform[d.platform] || 0) + 1;
     stats.byMap[d.currentMap] = (stats.byMap[d.currentMap] || 0) + 1;
+    const rq = d.reviewQueue || 'none';
+    stats.byReviewQueue[rq] = (stats.byReviewQueue[rq] || 0) + 1;
     if (d.qualityRating != null) {
       totalRating += d.qualityRating;
       stats.ratedCount += 1;
@@ -306,4 +357,7 @@ module.exports = {
   removeTag,
   rateDraft,
   getDraftStats,
+  updateReviewQueue,
+  batchUpdateReviewQueue,
+  addReviewLog,
 };

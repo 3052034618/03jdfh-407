@@ -499,5 +499,141 @@
     "forbiddenInfo": [],
     "puzzleId": null,
     "qualityRating": null
+  },
+  {
+    "draftId": "8a5356d3-3aa1-4ef6-b7f5-63d6b4b73fb5",
+    "chapterId": "ch02",
+    "currentMap": "医院西楼三层",
+    "answerType": "frequency",
+    "answerValue": "12",
+    "answerDisplay": "12",
+    "answerLength": 2,
+    "difficultyTier": "easy",
+    "difficulty": {},
+    "platform": "pc",
+    "broadcast": {
+      "text": "测试广播0.11571111895868169"
+    },
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "frequency",
+      "value": "12",
+      "display": "12"
+    },
+    "adaptation": {},
+    "platformAdjustments": [],
+    "spoilerFilter": {
+      "applied": false,
+      "filteredItems": []
+    },
+    "status": "adopted",
+    "reviewQueue": "none",
+    "reviewLog": [],
+    "tags": [
+      "chapter2",
+      "critical"
+    ],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T20:16:05.113Z",
+    "updatedAt": "2026-06-18T20:16:05.163Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": 4
+  },
+  {
+    "draftId": "0d033bd3-9a28-4965-b3c9-a2edbeddf943",
+    "chapterId": "ch02",
+    "currentMap": "太平间",
+    "answerType": "code",
+    "answerValue": "12",
+    "answerDisplay": "12",
+    "answerLength": 2,
+    "difficultyTier": "hard",
+    "difficulty": {},
+    "platform": "mobile",
+    "broadcast": {
+      "text": "测试广播0.12562400876672575"
+    },
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "code",
+      "value": "12",
+      "display": "12"
+    },
+    "adaptation": {},
+    "platformAdjustments": [
+      {},
+      {},
+      {},
+      {},
+      {}
+    ],
+    "spoilerFilter": {
+      "applied": true,
+      "totalReplacements": 3,
+      "fullReport": {}
+    },
+    "status": "adopted",
+    "reviewQueue": "none",
+    "reviewLog": [],
+    "tags": [
+      "chapter2",
+      "critical"
+    ],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T20:16:05.117Z",
+    "updatedAt": "2026-06-18T20:16:05.149Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": null
+  },
+  {
+    "draftId": "8a862bf0-e75d-4def-8a6a-2b4280f30605",
+    "chapterId": "ch02",
+    "currentMap": "地下车库",
+    "answerType": "name",
+    "answerValue": "12",
+    "answerDisplay": "12",
+    "answerLength": 2,
+    "difficultyTier": "nightmare",
+    "difficulty": {},
+    "platform": "console",
+    "broadcast": {
+      "text": "测试广播0.38287387809870943"
+    },
+    "clues": [],
+    "wrongFeedback": [],
+    "successHook": {},
+    "answer": {
+      "type": "name",
+      "value": "12",
+      "display": "12"
+    },
+    "adaptation": {},
+    "platformAdjustments": [],
+    "spoilerFilter": {
+      "applied": false,
+      "filteredItems": []
+    },
+    "status": "adopted",
+    "reviewQueue": "none",
+    "reviewLog": [],
+    "tags": [
+      "chapter2",
+      "critical"
+    ],
+    "notes": "",
+    "section": "",
+    "createdAt": "2026-06-18T20:16:05.120Z",
+    "updatedAt": "2026-06-18T20:16:05.149Z",
+    "forbiddenInfo": [],
+    "puzzleId": null,
+    "qualityRating": null
   }
 ]

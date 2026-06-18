@@ -339,8 +339,15 @@ select{cursor:pointer}
 
 <div id="tab-drafts" class="tab-content">
   <div class="stats-grid" id="draftsStatsGrid"></div>
+  <div style="display:flex;gap:4px;margin-bottom:8px;flex-wrap:wrap" id="reviewQueueTabs">
+    <button class="sub-tab active" data-rq="none" onclick="setReviewQueue('none')">全部</button>
+    <button class="sub-tab" data-rq="pending_review" onclick="setReviewQueue('pending_review')">📋 待复核</button>
+    <button class="sub-tab" data-rq="passed" onclick="setReviewQueue('passed')">✅ 已通过</button>
+    <button class="sub-tab" data-rq="needs_rewrite" onclick="setReviewQueue('needs_rewrite')">✏️ 需重写</button>
+    <span id="rqCounts" style="font-size:10px;color:#6a6a7e;margin-left:8px;align-self:center"></span>
+  </div>
   <div class="panel-toolbar">
-    <input type="text" id="draftsSearch" placeholder="🔎 全局搜索（关键词、线索、地图）" style="flex:2;min-width:200px;padding:5px 10px">
+    <input type="text" id="draftsSearch" placeholder="🔎 全局搜索（关键词、线索、地图）" style="flex:2;min-width:200px;padding:5px 10px" oninput="debounceSearch()">
     <button class="btn tiny secondary" onclick="resetDraftFilters()">重置筛选</button>
     <button class="btn tiny secondary" onclick="clearAllDraftFilters()">🗑 清空条件</button>
     <div class="spacer"></div>
@@ -398,6 +405,7 @@ select{cursor:pointer}
     <input type="text" id="timelineSessionId" style="flex:1">
     <button class="btn tiny" onclick="refreshTimeline()">刷新时间线</button>
     <button class="btn tiny secondary" onclick="createNewSession();$('timelineSessionId').value=currentSessionId;refreshTimeline()">新建会话</button>
+    <button class="btn tiny secondary" onclick="exportTimelineText()" id="exportTimelineBtn">📋 导出复盘文本</button>
   </div>
   <div id="timelineStats" style="font-size:11px;color:#6a6a7e;margin-bottom:10px"></div>
   <div class="split-cols" id="timelineContainer" style="display:none">
@@ -465,6 +473,9 @@ let currentSessionId = null;
 let selectedDraftIds = new Set();
 let currentTimelineId = null;
 let answerVisible = false;
+let currentReviewQueue = 'none';
+let lastRenderedDraft = null;
+let lastTimelineEvents = [];
 
 const $ = id => document.getElementById(id);
 
@@ -890,23 +901,67 @@ async function refreshDrafts() {
     const v = $(id).value;
     if (v) params.append(k, v);
   });
+  if (currentReviewQueue !== 'none') params.append('reviewQueue', currentReviewQueue);
   if ($('draftsSearch').value) params.append('search', $('draftsSearch').value);
   const qs = params.toString();
   const { ok, data } = await apiCall('GET', '/drafts' + (qs ? '?' + qs : ''));
   if (ok) {
-    if (data.stats) renderStatsGrid(data.stats);
+    if (data.stats) {
+      renderStatsGrid(data.stats);
+      const rq = data.stats.byReviewQueue || {};
+      $('rqCounts').textContent = `待复核 ${rq.pending_review || 0} · 已通过 ${rq.passed || 0} · 需重写 ${rq.needs_rewrite || 0}`;
+    }
     renderDraftsList(data.drafts || []);
     saveDraftFilters();
   }
 }
 
-$('draftsSearch').addEventListener('input', () => clearTimeout(window._t), window._t = setTimeout(refreshDrafts, 300));
+function debounceSearch() {
+  clearTimeout(window._searchT);
+  window._searchT = setTimeout(refreshDrafts, 300);
+}
+
+// ====== 评审队列 ======
+function setReviewQueue(q) {
+  currentReviewQueue = q;
+  document.querySelectorAll('#reviewQueueTabs .sub-tab').forEach(b => {
+    b.classList.toggle('active', b.dataset.rq === q);
+  });
+  saveDraftFilters();
+  refreshDrafts();
+}
+
+async function setDraftReviewQueue(id, queue) {
+  const { ok } = await apiCall('PATCH', '/drafts/' + id + '/review-queue', { queue });
+  if (ok) { updateStatus('已移入 ' + queue); refreshDrafts(); }
+}
+
+async function batchSetReviewQueue(queue) {
+  if (selectedDraftIds.size === 0) return;
+  const { ok, data } = await apiCall('PATCH', '/drafts/batch/review-queue', {
+    draftIds: Array.from(selectedDraftIds), queue,
+  });
+  if (ok) {
+    updateStatus('✅ 已批量移入 ' + queue + ' ' + data.updatedCount + ' 条');
+    selectedDraftIds.clear();
+    refreshDrafts();
+  }
+}
+
+async function addDraftReviewLog(id, action, decision, comment) {
+  const reviewer = prompt('评审人姓名（可留空）:', '') || 'anonymous';
+  const { ok } = await apiCall('POST', '/drafts/' + id + '/review-log', {
+    action, decision, comment, reviewer,
+  });
+  return ok;
+}
 
 function saveDraftFilters() {
   const state = {};
   ['f_chapterId','f_map','f_answerType','f_tier','f_platform','f_status','f_sortBy','f_sortDir','draftsSearch'].forEach(id => {
     state[id] = $(id).value;
   });
+  state.reviewQueue = currentReviewQueue;
   try { localStorage.setItem('drf_filters', JSON.stringify(state)); } catch(e) {}
 }
 
@@ -915,7 +970,16 @@ function loadDraftFilters() {
     const raw = localStorage.getItem('drf_filters');
     if (!raw) return;
     const state = JSON.parse(raw);
-    Object.entries(state).forEach(([k, v]) => { if ($(k) && v != null) $(k).value = v; });
+    Object.entries(state).forEach(([k, v]) => {
+      if (k === 'reviewQueue') {
+        currentReviewQueue = v || 'none';
+        return;
+      }
+      if ($(k) && v != null) $(k).value = v;
+    });
+    document.querySelectorAll('#reviewQueueTabs .sub-tab').forEach(b => {
+      b.classList.toggle('active', b.dataset.rq === currentReviewQueue);
+    });
   } catch(e) {}
 }
 
@@ -936,6 +1000,7 @@ function renderDraftsList(drafts) {
   const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
   const platformLabels = { pc: 'PC', console: '主机', mobile: '移动端' };
   const tierLabels = { easy: '轻松', standard: '标准', hard: '硬核', nightmare: '噩梦' };
+  const rqLabels = { none: '', pending_review: '📋待复核', passed: '✅已通过', needs_rewrite: '✏️需重写' };
 
   let html = '';
   drafts.forEach(d => {
@@ -947,16 +1012,17 @@ function renderDraftsList(drafts) {
       for (let i = 1; i <= 5; i++) s += `<span class="star ${i <= n ? 'on' : ''}" onclick="event.stopPropagation();rateDraft('${d.draftId}',${i})">★</span>`;
       return '<span class="rate-stars" onclick="event.stopPropagation()">' + s + '</span>';
     })(d.qualityRating);
+    const rqTag = d.reviewQueue && d.reviewQueue !== 'none'
+      ? `<span class="badge ${d.reviewQueue === 'passed' ? 'ok' : d.reviewQueue === 'needs_rewrite' ? 'warn' : 'cold'}">${escHtml(rqLabels[d.reviewQueue] || '')}</span>` : '';
 
     html += `<div class="draft-item ${d.status} ${isSel ? 'selected' : ''}">
-      <div class="row-main" onclick="toggleSelect('${d.draftId}')">
-        <input type="checkbox" class="checkbox-select" onclick="event.stopPropagation()" ${isSel ? 'checked' : ''}>
-      </div>
-      <div class="row-main" style="margin-top:-26px;margin-left:30px;cursor:pointer" onclick="event.stopPropagation();openDraftModal('${d.draftId}')">
-        <div style="flex:1">
+      <div class="row-main" style="cursor:pointer" onclick="toggleSelect('${d.draftId}')">
+        <input type="checkbox" class="checkbox-select" onclick="event.stopPropagation();toggleSelect('${d.draftId}')" ${isSel ? 'checked' : ''}>
+        <div style="flex:1;margin-left:6px" onclick="event.stopPropagation();openDraftModal('${d.draftId}')">
           <div class="draft-title">
             <span class="tier-tag tier-${d.difficultyTier}">${escHtml(tierLabels[d.difficultyTier] || d.difficultyTier || '—')}</span>
             ${escHtml(mapText)} · ${escHtml(typeLabels[d.answerType] || d.answerType)}
+            ${rqTag}
             ${stars}
           </div>
           <div class="draft-meta">
@@ -965,6 +1031,7 @@ function renderDraftsList(drafts) {
             ${d.hasSpoilerFilter ? `<span class="badge hot">禁${d.spoilerReplacements || 0}</span>` : ''}
             ${d.platformAdjustmentsCount ? `<span class="badge warn">调${d.platformAdjustmentsCount}</span>` : ''}
             ${d.answerLength ? `<span class="badge">长${d.answerLength}</span>` : ''}
+            ${d.reviewLogCount ? `<span class="badge cold">审${d.reviewLogCount}</span>` : ''}
             <span>${new Date(d.updatedAt).toLocaleString('zh-CN', { hour12: false })}</span>
           </div>
           <div style="font-size:10px;color:#5a5a6e;margin-top:4px;line-height:1.4;height:28px;overflow:hidden">${escHtml(d.broadcastPreview || '')}</div>
@@ -972,7 +1039,10 @@ function renderDraftsList(drafts) {
         </div>
       </div>
       <div style="margin-left:30px;margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
-        <button class="btn tiny secondary" onclick="event.stopPropagation();useDraftAsResult('${d.draftId}')">📥 载入结果</button>
+        <button class="btn tiny secondary" onclick="event.stopPropagation();useDraftAsResult('${d.draftId}')">📥 载入</button>
+        <button class="btn tiny secondary" onclick="event.stopPropagation();setDraftReviewQueue('${d.draftId}','pending_review')">📋复核</button>
+        <button class="btn tiny secondary" onclick="event.stopPropagation();setDraftReviewQueue('${d.draftId}','passed')">✅通过</button>
+        <button class="btn tiny secondary" onclick="event.stopPropagation();setDraftReviewQueue('${d.draftId}','needs_rewrite')">✏️重写</button>
         <button class="btn tiny" onclick="event.stopPropagation();markStatus('${d.draftId}','adopted')">✓采用</button>
         <button class="btn tiny warn" onclick="event.stopPropagation();markStatus('${d.draftId}','archived')">▣归档</button>
         <button class="btn tiny danger" onclick="event.stopPropagation();delDraft('${d.draftId}')">✕</button>
@@ -985,8 +1055,18 @@ function renderDraftsList(drafts) {
 
 function toggleSelect(id) {
   if (selectedDraftIds.has(id)) selectedDraftIds.delete(id);
-  else selectedDraftIds.add(id);
-  refreshDrafts();
+  else if (selectedDraftIds.size < 3) selectedDraftIds.add(id);
+  else { showToast('最多选 3 条对比', 'warn'); return; }
+  updateSelectedCount();
+  const el = document.querySelector(`.draft-item input[onclick*="'${id}'"]`);
+  if (el) el.checked = selectedDraftIds.has(id);
+  document.querySelectorAll('.draft-item').forEach(item => {
+    const cb = item.querySelector('.checkbox-select');
+    if (cb) {
+      const oid = cb.getAttribute('onclick')?.match(/'([^']+)'/)?.[1];
+      if (oid) item.classList.toggle('selected', selectedDraftIds.has(oid));
+    }
+  });
 }
 
 function updateSelectedCount() {
@@ -1006,6 +1086,9 @@ async function rateDraft(id, rating) {
 }
 
 async function markStatus(id, status) {
+  const statusLabels = { adopted: '采用', archived: '归档' };
+  const comment = prompt('评审意见（可留空）:', '');
+  await addDraftReviewLog(id, 'status_change', statusLabels[status] || status, comment || '');
   const { ok } = await apiCall('PATCH', '/drafts/' + id + '/status', { status });
   if (ok) { updateStatus('已更新状态'); refreshDrafts(); }
 }
@@ -1230,7 +1313,8 @@ function renderDraftModal(d) {
       <div style="font-size:11px;color:#8a8a9e">启用过滤但禁用词未命中本次生成内容</div></div>`;
   }
 
-  html += `<div class="review-section"><div class="review-title">📎 元数据</div>
+  const rqLabels = { none: '无', pending_review: '📋 待复核', passed: '✅ 已通过', needs_rewrite: '✏️ 需重写' };
+  html += `<div class="review-section"><div class="review-title">📎 元数据 · 评审队列: <span class="badge ${d.reviewQueue === 'passed' ? 'ok' : d.reviewQueue === 'needs_rewrite' ? 'warn' : d.reviewQueue === 'pending_review' ? 'cold' : ''}">${escHtml(rqLabels[d.reviewQueue] || '无')}</span></div>
     <div style="font-size:11px;color:#8a8a9e;line-height:1.8">
       <div>📅 创建: ${escHtml(d.createdAt || '-')}</div>
       <div>🔄 更新: ${escHtml(d.updatedAt || '-')}</div>
@@ -1239,10 +1323,27 @@ function renderDraftModal(d) {
       <div>🧠 禁用词清单: ${d.forbiddenInfo?.length ? d.forbiddenInfo.map(t => `<span class="diff-tag warn">${escHtml(t)}</span>`).join(' ') : '无'}</div>
     </div></div>`;
 
+  if (d.reviewLog && d.reviewLog.length) {
+    html += `<div class="review-section"><div class="review-title">📝 评审记录 <span class="count">${d.reviewLog.length} 条</span></div>`;
+    d.reviewLog.forEach(r => {
+      html += `<div style="padding:5px 10px;margin:4px 0;background:#12121e;border-left:2px solid #4a9eff;font-size:11px">
+        <div style="display:flex;justify-content:space-between">
+          <span><strong>[${escHtml(r.action)}]</strong> ${escHtml(r.decision)}</span>
+          <span style="color:#6a6a7e;font-size:9px">${escHtml(r.reviewer)} · ${new Date(r.timestamp).toLocaleString('zh-CN', { hour12: false })}</span>
+        </div>
+        ${r.comment ? `<div style="color:#8a8a9e;margin-top:3px">${escHtml(r.comment)}</div>` : ''}
+      </div>`;
+    });
+    html += '</div>';
+  }
+
   html += `<div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap">
     <button class="btn" onclick="useDraftAsResult('${d.draftId}');closeDraftModal()">📥 载入结果</button>
-    <button class="btn secondary" onclick="markStatus('${d.draftId}','adopted');refreshDrafts();closeDraftModal()">✓ 标记采用</button>
-    <button class="btn warn" onclick="markStatus('${d.draftId}','archived');refreshDrafts();closeDraftModal()">▣ 归档</button>
+    <button class="btn secondary" onclick="setDraftReviewQueue('${d.draftId}','pending_review');closeDraftModal()">📋 待复核</button>
+    <button class="btn secondary" onclick="setDraftReviewQueue('${d.draftId}','passed');closeDraftModal()">✅ 已通过</button>
+    <button class="btn secondary" onclick="setDraftReviewQueue('${d.draftId}','needs_rewrite');closeDraftModal()">✏️ 需重写</button>
+    <button class="btn secondary" onclick="markStatus('${d.draftId}','adopted');closeDraftModal()">✓ 采用</button>
+    <button class="btn warn" onclick="markStatus('${d.draftId}','archived');closeDraftModal()">▣ 归档</button>
     <button class="btn danger" onclick="if(confirm('删除？')){delDraft('${d.draftId}');closeDraftModal()}">✕ 删除</button>
   </div>`;
 
@@ -1267,7 +1368,6 @@ function showToast(msg, type = 'ok') {
 }
 
 // ====== 导出评审文本 ======
-let lastRenderedDraft = null;
 function buildReviewText(d) {
   const typeLabels = { frequency: '频率', date: '日期', name: '人名', direction: '方位', code: '代码' };
   const tierLabels = { easy: '轻松', standard: '标准', hard: '硬核', nightmare: '噩梦' };
@@ -1275,6 +1375,7 @@ function buildReviewText(d) {
   const platformLabels = { pc: 'PC', console: '主机', mobile: '移动端' };
   const catLabels = { person: '人物', place: '地点', event: '事件', thing: '物品', generic: '通用' };
 
+  const rqLabels = { none: '无', pending_review: '待复核', passed: '已通过', needs_rewrite: '需重写' };
   const lines = [];
   lines.push('=== 阴间电台谜题 · 策划评审单 ===');
   lines.push('草稿 ID: ' + (d.draftId || '').slice(0, 10));
@@ -1284,6 +1385,7 @@ function buildReviewText(d) {
   lines.push('难度档: ' + (tierLabels[d.difficultyTier] || d.difficultyTier || '-'));
   lines.push('平台: ' + (platformLabels[d.platform] || d.platform));
   lines.push('状态: ' + (statusLabels[d.status] || d.status));
+  lines.push('评审队列: ' + (rqLabels[d.reviewQueue] || d.reviewQueue || '无'));
   if (d.qualityRating) lines.push('质量评分: ' + '★'.repeat(d.qualityRating) + '☆'.repeat(5 - d.qualityRating));
   lines.push('创建: ' + (d.createdAt || '-'));
   lines.push('更新: ' + (d.updatedAt || '-'));
@@ -1341,6 +1443,14 @@ function buildReviewText(d) {
   if (d.tags?.length) lines.push('标签: ' + d.tags.join(', '));
   if (d.notes) lines.push('备注: ' + d.notes);
   if (d.forbiddenInfo?.length) lines.push('禁用词清单: ' + d.forbiddenInfo.join(', '));
+  if (d.reviewLog?.length) {
+    lines.push('');
+    lines.push('--- 评审记录 (' + d.reviewLog.length + ' 条) ---');
+    d.reviewLog.forEach((r, i) => {
+      lines.push(`  ${i + 1}. [${r.action}] ${r.decision} — ${r.reviewer} — ${r.timestamp}`);
+      if (r.comment) lines.push(`     意见: ${r.comment}`);
+    });
+  }
   lines.push('');
   lines.push('=== 评审结束 ' + new Date().toLocaleString('zh-CN', { hour12: false }) + ' ===');
   return lines.join('\n');
@@ -1395,7 +1505,14 @@ function toggleCompareDecision(draftId, kind) {
 async function applyCompareDecisions() {
   const toAdopt = Object.entries(compareDecisions).filter(([_, v]) => v === 'adopt').map(([k]) => k);
   const toArchive = Object.entries(compareDecisions).filter(([_, v]) => v === 'archive').map(([k]) => k);
+  const comment = prompt('本次对比复核的评审意见:', '') || '';
   let ok = true;
+  for (const id of toAdopt) {
+    await addDraftReviewLog(id, 'compare_adopt', '对比采用', comment);
+  }
+  for (const id of toArchive) {
+    await addDraftReviewLog(id, 'compare_archive', '对比归档', comment);
+  }
   if (toAdopt.length) {
     const r = await apiCall('PATCH', '/drafts/batch/status', { draftIds: toAdopt, status: 'adopted' });
     if (!r.ok) ok = false;
@@ -1405,7 +1522,6 @@ async function applyCompareDecisions() {
     if (!r.ok) ok = false;
   }
   if (ok) {
-    const total = toAdopt.length + toArchive.length;
     showToast(`✅ 已应用决策: 采用${toAdopt.length}条, 归档${toArchive.length}条`);
     selectedDraftIds.clear();
     closeCompareModal();
@@ -1507,6 +1623,103 @@ function renderCompareModal() {
 }
 
 function findCompare(id) { return loadedCompareDrafts.find(x => x.draftId === id); }
+
+// ====== 时间线复盘导出 ======
+function buildTimelineExportText(events, sessionInfo) {
+  const typeLabels = {
+    session_created: '创建会话',
+    puzzle_generated: '生成谜题',
+    replay_requested: '请求重播',
+    attempt_recorded: '答案尝试',
+    failure_reported: '报告失败',
+    player_state_updated: '玩家状态更新',
+    session_reset: '重置会话',
+  };
+  const levelLabels = ['原始 (Lv0)', '微光 (Lv1)', '回声 (Lv2)', '余烬 (Lv3)'];
+
+  const lines = [];
+  lines.push('=== 阴间电台 · 调试复盘报告 ===');
+  lines.push('会话ID: ' + (sessionInfo?.sessionId || '').slice(0, 10));
+  lines.push('章节: ' + (sessionInfo?.chapterId || '-'));
+  lines.push('导出时间: ' + new Date().toLocaleString('zh-CN', { hour12: false }));
+  lines.push('');
+
+  let prevFC = null;
+  events.forEach((ev, i) => {
+    const fc = ev.failureCount ?? ev.afterFailure ?? ev.failureCountAtGen ?? null;
+    const level = fc != null ? Math.min(3, Math.floor(fc / 2)) : null;
+    const ts = new Date(ev.timestamp).toLocaleString('zh-CN', { hour12: false });
+    const label = typeLabels[ev.type] || ev.type;
+
+    lines.push(`--- #${i + 1} ${label} [${ts}] ---`);
+
+    if (fc != null) {
+      lines.push(`  失败次数: ${fc}` + (prevFC != null && fc !== prevFC ? ` (之前 ${prevFC}, 变化 ${fc > prevFC ? '+' : ''}${fc - prevFC})` : ''));
+      lines.push(`  适配等级: ${levelLabels[level] || 'Lv' + level}`);
+    }
+
+    if (ev.type === 'session_created') {
+      lines.push(`  章节: ${ev.chapterId || '-'}`);
+    } else if (ev.type === 'puzzle_generated') {
+      lines.push(`  谜题 #${(ev.puzzleIndex ?? 0) + 1} · 类型: ${ev.answerType || '-'} · 平台: ${ev.platform || '-'}`);
+      if (ev.broadcastSnapshot?.text) {
+        lines.push(`  广播: ${ev.broadcastSnapshot.text.slice(0, 200)}`);
+      }
+    } else if (ev.type === 'replay_requested') {
+      lines.push(`  谜题 #${(ev.puzzleIndex ?? 0) + 1} · 适配 Lv${ev.adaptationLevel ?? 0}`);
+      if (ev.replayBroadcast?.text) {
+        lines.push(`  重播广播: ${ev.replayBroadcast.text.slice(0, 200)}`);
+      }
+    } else if (ev.type === 'attempt_recorded') {
+      lines.push(`  谜题 #${(ev.puzzleIndex ?? 0) + 1} · 结果: ${ev.correct ? '✅ 正确' : '❌ 错误'}`);
+      lines.push(`  答案: ${JSON.stringify(ev.answer)}`);
+    } else if (ev.type === 'failure_reported') {
+      lines.push(`  ${ev.beforeFailure} → ${ev.afterFailure} (+${ev.delta || 1})`);
+      lines.push(`  原因: ${ev.reason || 'manual'}`);
+    } else if (ev.type === 'session_reset') {
+      lines.push(`  失败次数 ${ev.beforeFailure} → ${ev.afterFailure || 0}`);
+    }
+
+    lines.push('');
+    prevFC = fc;
+  });
+
+  if (sessionInfo?.playerState) {
+    lines.push('--- 会话最终状态 ---');
+    lines.push(`  当前失败次数: ${sessionInfo.playerState.failureCount || 0}`);
+    const fl = Math.min(3, Math.floor((sessionInfo.playerState.failureCount || 0) / 2));
+    lines.push(`  适配等级: ${levelLabels[fl]}`);
+    lines.push(`  谜题数: ${sessionInfo.puzzles?.length || 0}`);
+  }
+
+  lines.push('');
+  lines.push('=== 复盘结束 ===');
+  return lines.join('\n');
+}
+
+async function exportTimelineText() {
+  const sid = $('timelineSessionId').value.trim() || currentSessionId;
+  if (!sid) { showToast('请先选择会话', 'warn'); return; }
+  const { ok: okTl, data: tlData } = await apiCall('GET', '/session/' + sid + '/timeline');
+  const { ok: okInfo, data: sessionInfo } = await apiCall('GET', '/session/' + sid);
+  if (!okTl) { showToast('获取时间线失败', 'error'); return; }
+  const text = buildTimelineExportText(tlData.timeline || [], okInfo ? sessionInfo : null);
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+    }
+    showToast('✅ 已复制复盘文本到剪贴板');
+  } catch (e) {
+    showToast('复制失败: ' + e.message, 'error');
+  }
+}
 
 // 把 openDraftModal 的 lastRenderedDraft 同步
 const _origOpenDraftModal = openDraftModal;
